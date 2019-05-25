@@ -72,7 +72,7 @@ try? database.insertOrUpdate(elements: teachers)
 ### Operators
 Database objects can use different custom operators, which wrap try-catch logic and give a more compact way to access database
 ```swift
-// Update or insert
+// Insert or update
 database ++= teachers
 
 // Read
