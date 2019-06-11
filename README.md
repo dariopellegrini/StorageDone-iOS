@@ -1,5 +1,5 @@
 # StorageDone
-Swift library to make easy using local MongoDB in iOS apps.
+Swift library to make easy using local document-oriented in iOS apps.
 
 ### Disclaimer
 This library is in development, therefore should not be used in a production context for the moment. Thank you.
