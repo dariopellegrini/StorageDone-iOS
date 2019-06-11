@@ -7,120 +7,17 @@
 //
 
 import Foundation
-import MongoSwift
 import RxSwift
 
 
-public extension Database {
-    var rx: RxWrapper<Database> {
+public extension StorageDoneDatabase {
+    var rx: RxWrapper<StorageDoneDatabase> {
         get { return RxWrapper(self) }
         set { }
     }
-    
-    func rxInsert<T: Encodable>(element: T) -> Observable<T> {
-        return Observable.create {
-            subscriber in
-            do {
-                try self.insert(element: element)
-                subscriber.onNext(element)
-            } catch let e {
-                subscriber.onError(e)
-            }
-            return Disposables.create()
-        }
-    }
-    
-    func rxInsert<T: Encodable>(elements: [T]) -> Observable<[T]> {
-        return Observable.create {
-            subscriber in
-            do {
-                try self.insert(elements: elements)
-                subscriber.onNext(elements)
-            } catch let e {
-                subscriber.onError(e)
-            }
-            return Disposables.create()
-        }
-    }
-    
-    func rxInsertOrUpdate<T: Encodable>(element: T) -> Observable<T> {
-        return Observable.create {
-            subscriber in
-            do {
-                try self.insertOrUpdate(element: element)
-                subscriber.onNext(element)
-            } catch let e {
-                subscriber.onError(e)
-            }
-            return Disposables.create()
-        }
-    }
-    
-    func rxInsertOrUpdate<T: Encodable>(elements: [T]) -> Observable<[T]> {
-        return Observable.create {
-            subscriber in
-            do {
-                try self.insertOrUpdate(elements: elements)
-                subscriber.onNext(elements)
-            } catch let e {
-                subscriber.onError(e)
-            }
-            return Disposables.create()
-        }
-    }
-    
-    func rxGet<T: Decodable>() -> Observable<[T]> {
-        return Observable.create {
-            subscriber in
-            do {
-                subscriber.onNext( try self.get() )
-            } catch let e {
-                subscriber.onError(e)
-            }
-            return Disposables.create()
-        }
-    }
-    
-    func rxget<T: Decodable>(query: Document) -> Observable<[T]> {
-        return Observable.create {
-            subscriber in
-            do {
-                subscriber.onNext( try self.get(query: query) )
-            } catch let e {
-                subscriber.onError(e)
-            }
-            return Disposables.create()
-        }
-    }
-    
-    func rxDelete<T: Decodable>(type: T.Type, filter: Document) -> Observable<Void> {
-        return Observable.create {
-            subscriber in
-            do {
-                subscriber.onNext( try self.delete(type: type, filter: filter) )
-            } catch let e {
-                subscriber.onError(e)
-            }
-            return Disposables.create()
-        }
-    }
-    
-    func rxDeleteAllAndInsert<T: Encodable>(elements: [T]) -> Observable<[T]> {
-        return Observable.create {
-            subscriber in
-            do {
-                try self.delete(type: T.self, filter: [:])
-                try self.insert(elements: elements)
-                subscriber.onNext(elements)
-            } catch let e {
-                subscriber.onError(e)
-            }
-            return Disposables.create()
-        }
-    }
 }
 
-public extension RxWrapper where Base == Database {
+public extension RxWrapper where Base == StorageDoneDatabase {
     func insert<T: Encodable>(element: T) -> Observable<T> {
         return Observable.create {
             subscriber in
@@ -185,11 +82,11 @@ public extension RxWrapper where Base == Database {
         }
     }
     
-    func get<T: Decodable>(query: Document) -> Observable<[T]> {
+    func get<T: Decodable>(filter: [String:String]) -> Observable<[T]> {
         return Observable.create {
             subscriber in
             do {
-                subscriber.onNext( try self.base.get(query: query) )
+                subscriber.onNext( try self.base.get(filter: filter) )
             } catch let e {
                 subscriber.onError(e)
             }
@@ -197,11 +94,15 @@ public extension RxWrapper where Base == Database {
         }
     }
     
-    func delete<T: Decodable>(type: T.Type, filter: Document) -> Observable<Void> {
+    func delete<T: Decodable>(type: T.Type, filter: [String:String]? = nil) -> Observable<Void> {
         return Observable.create {
             subscriber in
             do {
-                subscriber.onNext( try self.base.delete(type: type, filter: filter) )
+                if let filter = filter {
+                    subscriber.onNext( try self.base.delete(type, filter: filter) )
+                } else {
+                    subscriber.onNext(try self.base.delete(type))
+                }
             } catch let e {
                 subscriber.onError(e)
             }
@@ -213,7 +114,7 @@ public extension RxWrapper where Base == Database {
         return Observable.create {
             subscriber in
             do {
-                try self.base.delete(type: T.self, filter: [:])
+                try self.base.delete(T.self)
                 try self.base.insert(elements: elements)
                 subscriber.onNext(elements)
             } catch let e {

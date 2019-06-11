@@ -7,53 +7,44 @@
 //
 
 import Foundation
-import MongoSwift
 
 prefix operator <-
-public prefix func <-<T: Decodable>(database: Database) -> [T] {
+public prefix func <-<T: Decodable>(database: StorageDoneDatabase) -> [T] {
     return (try? database.get()) ?? []
 }
 
 infix operator <-
-public func <-<T: Decodable>(query: Document, database: Database) -> [T] {
+public func <-<T: Decodable>(query: [String:Any], database: StorageDoneDatabase) -> [T] {
     do {
-        return try database.get(query: query)
+        return try database.get(filter: query)
     } catch let e {
-        print("Database operator error: ", e)
+        print("DatabaseCore operator error: ", e)
         return []
     }
 }
 
 infix operator ++=
-public func ++=<T: Encodable>(database: Database, element: T) {
+public func ++=<T: Encodable>(database: StorageDoneDatabase, element: T) {
     do {
         try database.insertOrUpdate(element: element)
     } catch let e {
-        print("Database operator error: ", e)
+        print("DatabaseCore operator error: ", e)
     }
 }
 
-public func ++=<T: Encodable>(database: Database, elements: [T]) {
+public func ++=<T: Encodable>(database: StorageDoneDatabase, elements: [T]) {
     do {
         try database.insertOrUpdate(elements: elements)
     } catch let e {
-        print("Database operator error: ", e)
+        print("DatabaseCore operator error: ", e)
     }
 }
 
 infix operator --=
-public func --=<T: Encodable>(database: Database, element: T) {
+public func --=<T>(database: StorageDoneDatabase, elementType: T.Type) {
     do {
-        try database.delete(element: element)
+        try database.delete(elementType)
     } catch let e {
-        print("Database operator error: ", e)
-    }
-}
-
-public func --=<T: Encodable>(database: Database, elements: [T]) {
-    do {
-        try database.delete(elements: elements)
-    } catch let e {
-        print("Database operator error: ", e)
+        print("DatabaseCore operator error: ", e)
     }
 }

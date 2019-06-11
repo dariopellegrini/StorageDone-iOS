@@ -70,10 +70,8 @@ Pod::Spec.new do |spec|
   # spec.watchos.deployment_target = "2.0"
   # spec.tvos.deployment_target = "9.0"
 
-  spec.dependency 'StitchSDK', '~> 6.0.0'
-  spec.dependency 'StitchLocalMongoDBService', '~> 6.0.0'
-  spec.dependency 'RxSwift',    '~> 4.0'
-  spec.dependency 'RxCocoa',    '~> 4.0'
+  spec.dependency 'CouchbaseLite-Swift', '~> 2.5.0'
+  spec.dependency 'RxSwift'
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
