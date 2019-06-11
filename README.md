@@ -81,9 +81,6 @@ let teachers: [Teacher] = <-database
 // Filter
 let filteredTeachers: [Teacher] = ["id":"id1"] <- database
 
-// Delete
-database --= teachers
-```
 
 ## Author
 
