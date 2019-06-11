@@ -60,7 +60,7 @@ struct Teacher: Codable, PrimaryKey {
 }
 ```
 
-Primary keys come in combination with update or insert methods
+Primary keys come in combination with insert or update methods
 ```swift
 let teachers = [Teacher(id: "id1", name: "Sarah", surname: "Jones", age: 29, cv: "https://my.cv.com/sarah_jones"),
                 Teacher(id: "id2", name: "Silvia", surname: "Jackson", age: 29, cv: "https://my.cv.com/silvia_jackson"),
@@ -80,7 +80,7 @@ let teachers: [Teacher] = <-database
 
 // Filter
 let filteredTeachers: [Teacher] = ["id":"id1"] <- database
-
+```
 
 ## Author
 
