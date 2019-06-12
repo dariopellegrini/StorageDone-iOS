@@ -24,10 +24,10 @@ struct Teacher: Codable {
 }
 ```
 
-Then create a `Database` object and save an instance of a Codable model in it
+Then create a `StorageDoneDatabase` object and save an instance of a Codable model in it
 ```swift
 let teacher = Teacher(id: "id1", name: "Sarah", surname: "Jones", age: 29, cv: "https://my.cv.com/sarah_jones")
-let database = Database(name: "teachers")
+let database = StorageDoneDatabase(name: "teachers")
 
 try? database.insert(element: teacher)
 ```
