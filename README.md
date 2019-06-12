@@ -1,4 +1,4 @@
-# StorageDone
+# StorageDone-iOS
 Swift library to make easy use local document-oriented databases in iOS apps.
 
 ### Disclaimer
@@ -88,4 +88,4 @@ Dario Pellegrini, pellegrini.dario.1303@gmail.com
 
 ## License
 
-StorageDone is available under the MIT license. See the LICENSE file for more info.
+StorageDone-iOS is available under the MIT license. See the LICENSE file for more info.
