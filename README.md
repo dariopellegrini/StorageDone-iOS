@@ -12,8 +12,7 @@ pod 'StorageDone', :git => 'https://github.com/dariopellegrini/StorageDone-iOS'
 ```
 
 ### Usage
-StorageDone lets you save Codable models in a local database very easily.
-
+StorageDone lets you save Codable models in a local database very easily.  
 First create a model
 ```swift
 struct Teacher: Codable {
