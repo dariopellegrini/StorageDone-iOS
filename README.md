@@ -6,13 +6,13 @@ This library is in development, therefore should not be used in a production con
 
 ### Installation
 To install StorageDone add this line to your Podfile
-
 ```
 pod 'StorageDone', :git => 'https://github.com/dariopellegrini/StorageDone-iOS'
 ```
 
 ### Usage
-StorageDone lets you save Codable models in a local database very easily.  
+StorageDone lets you save Codable models in a local database very easily.
+
 First create a model
 ```swift
 struct Teacher: Codable {
