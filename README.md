@@ -8,7 +8,7 @@ This library is in development, therefore should not be used in a production con
 To install StorageDone add this line to your Podfile
 
 ```
-pod 'StorageDone', _git => 'https://github.com/dariopellegrini/StorageDone-iOS'
+pod 'StorageDone', :git => 'https://github.com/dariopellegrini/StorageDone-iOS'
 ```
 
 ### Usage
