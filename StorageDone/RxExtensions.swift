@@ -94,7 +94,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func delete<T: Decodable>(type: T.Type, filter: [String:String]? = nil) -> Observable<Void> {
+    func delete<T>(type: T.Type, filter: [String:String]? = nil) -> Observable<Void> {
         return Observable.create {
             subscriber in
             do {
@@ -117,6 +117,18 @@ public extension RxWrapper where Base == StorageDoneDatabase {
                 try self.base.delete(T.self)
                 try self.base.insert(elements: elements)
                 subscriber.onNext(elements)
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func delete<T: PrimaryKey>(elements: [T]) -> Observable<Void> {
+        return Observable.create {
+            subscriber in
+            do {
+                try self.base.delete(elements: elements)
             } catch let e {
                 subscriber.onError(e)
             }

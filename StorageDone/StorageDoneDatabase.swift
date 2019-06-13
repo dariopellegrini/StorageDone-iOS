@@ -9,17 +9,19 @@
 import CouchbaseLiteSwift
 import Foundation
 
+public typealias CodablePrimaryKey = Codable & PrimaryKey
+
 public struct StorageDoneDatabase {
-    let database: Database
-    let databaseName: String
+    public let database: Database
+    let name: String
     private let type = "StorageDoneType"
     
-    public init(databaseName: String = "StorageDone") {
-        self.databaseName = databaseName
-        if let path = Bundle.main.path(forResource: databaseName, ofType: "cblite2"),
-            !Database.exists(withName: databaseName) {
+    public init(name: String = "StorageDone") {
+        self.name = name
+        if let path = Bundle.main.path(forResource: name, ofType: "cblite2"),
+            !Database.exists(withName: name) {
             do {
-                try Database.copy(fromPath: path, toDatabase: databaseName, withConfig: nil)
+                try Database.copy(fromPath: path, toDatabase: name, withConfig: nil)
             } catch {
                 fatalError("Could not load pre-built database")
             }
@@ -27,7 +29,7 @@ public struct StorageDoneDatabase {
         
         // 2
         do {
-            self.database = try Database(name: databaseName)
+            self.database = try Database(name: name)
         } catch {
             fatalError("Error opening database")
         }
@@ -83,7 +85,7 @@ public struct StorageDoneDatabase {
         var list = [T]()
         let decoder = JSONDecoder()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[databaseName],
+            if let singleDictionary = result.toDictionary()[name],
                 let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -105,7 +107,7 @@ public struct StorageDoneDatabase {
         var list = [T]()
         let decoder = JSONDecoder()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[databaseName] {
+            if let singleDictionary = result.toDictionary()[name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -130,7 +132,7 @@ public struct StorageDoneDatabase {
         var list = [T]()
         let decoder = JSONDecoder()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[databaseName] {
+            if let singleDictionary = result.toDictionary()[name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -151,7 +153,7 @@ public struct StorageDoneDatabase {
         var list = [T]()
         let decoder = JSONDecoder()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[databaseName] {
+            if let singleDictionary = result.toDictionary()[name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -222,6 +224,23 @@ public struct StorageDoneDatabase {
                 let doc = database.document(withID: id) {
                 try database.deleteDocument(doc)
             }
+        }
+    }
+    
+    public func delete<T: PrimaryKey>(element: T) throws {
+        if let primaryKeyValue = (Mirror(reflecting: element).children.filter {
+            $0.label != nil && $0.label == element.primaryKey()
+            }.first?.value),
+            let document = database.document(withID: "\(primaryKeyValue)-\(String(describing: T.self))") {
+            if String(describing: T.self) == document.string(forKey: type) {
+                try database.deleteDocument(document)
+            }
+        }
+    }
+    
+    public func delete<T: PrimaryKey>(elements: [T]) throws {
+        try elements.forEach {
+            try delete(element: $0)
         }
     }
 }

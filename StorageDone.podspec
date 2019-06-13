@@ -16,17 +16,17 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "StorageDone"
-  spec.version      = "0.1.0"
-  spec.summary      = "Swift library to make easy using local MongoDB in iOS apps."
+  spec.version      = "0.2.0"
+  spec.summary      = "Swift library to make easy using local document-oriented databases in iOS apps."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
   #   * Try to keep it short, snappy and to the point.
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
-  spec.description  = "Swift library to make easy using local MongoDB in iOS apps."
+  spec.description  = "Swift library to make easy using local document-oriented databases in iOS apps."
 
-  spec.homepage     = "https://github.com/dariopellegrini/StorageDone"
+  spec.homepage     = "https://github.com/dariopellegrini/StorageDone-iOS"
   # spec.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
@@ -79,7 +79,7 @@ Pod::Spec.new do |spec|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  spec.source       = { :git => "https://github.com/dariopellegrini/StorageDone.git", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/dariopellegrini/StorageDone-iOS.git", :tag => "#{spec.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

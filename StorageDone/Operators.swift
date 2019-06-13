@@ -41,9 +41,9 @@ public func ++=<T: Encodable>(database: StorageDoneDatabase, elements: [T]) {
 }
 
 infix operator --=
-public func --=<T>(database: StorageDoneDatabase, elementType: T.Type) {
+public func --=<T: PrimaryKey>(database: StorageDoneDatabase, elements: [T]) {
     do {
-        try database.delete(elementType)
+        try database.delete(elements: elements)
     } catch let e {
         print("DatabaseCore operator error: ", e)
     }
