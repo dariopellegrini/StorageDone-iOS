@@ -79,6 +79,9 @@ let teachers: [Teacher] = <-database
 
 // Filter
 let filteredTeachers: [Teacher] = ["id":"id1"] <- database
+
+// Delete if model implements PrimaryKey protocol
+database --= teachers
 ```
 
 ## Author
