@@ -69,9 +69,8 @@ try? database.insertOrUpdate(elements: teachers)
 ```
 
 ### RxSwift
-Every operation has its RxSwift version version. Each can be used through rx extension
-```kotlin
-...
+Every operation has its RxSwift version. Each can be used through rx extension
+```swift
 
 database.rx.insertOrUpdate(teachers)
 
