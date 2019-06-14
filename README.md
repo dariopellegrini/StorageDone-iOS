@@ -79,7 +79,9 @@ database.rx.insert(teachers)
 
 val teachers: List<Teacher> = database.rx.get()
 
-database.rx.delete(map("id" to "id2"))
+val teachers: List<Teacher> = database.rx.get(mapOf("id" to "id1")
+
+database.rx.delete(mapOf("id" to "id2"))
 
 database.rx.deleteAllAndInsert(teachers)
 
