@@ -68,6 +68,23 @@ let teachers = [Teacher(id: "id1", name: "Sarah", surname: "Jones", age: 29, cv:
 try? database.insertOrUpdate(elements: teachers)
 ```
 
+### RxSwift
+Every operation has its RxSwift version version. Each can be used through rx extension
+```kotlin
+...
+
+database.rx.insertOrUpdate(teachers)
+
+database.rx.insert(teachers)
+
+val teachers: List<Teacher> = database.rx.get()
+
+database.rx.delete(map("id" to "id2"))
+
+database.rx.deleteAllAndInsert(teachers)
+
+```
+
 ### Operators
 Database objects can use different custom operators, which wrap try-catch logic and give a more compact way to access database
 ```swift
