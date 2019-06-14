@@ -76,9 +76,9 @@ database.rx.insertOrUpdate(teachers)
 
 database.rx.insert(teachers)
 
-val teachers: List<Teacher> = database.rx.get()
+database.rx.get()
 
-val teachers: List<Teacher> = database.rx.get(mapOf("id" to "id1")
+database.rx.get(mapOf("id" to "id1")
 
 database.rx.delete(mapOf("id" to "id2"))
 
