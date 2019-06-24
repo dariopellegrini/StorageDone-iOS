@@ -40,10 +40,10 @@ extension String {
     public func regex(_ element: Any) -> ExpressionProtocol {
         return self /== element
     }
-    public func isNil(_ element: Any) -> ExpressionProtocol {
+    public var isNil: ExpressionProtocol {
         return *?self
     }
-    public func isNotNil(_ element: Any) -> ExpressionProtocol {
+    public var isNotNil: ExpressionProtocol {
         return *!self
     }
     public func greaterThan(_ date: Date) -> ExpressionProtocol {
