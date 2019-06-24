@@ -6,6 +6,7 @@
 //  Copyright © 2019 Dario Pellegrini. All rights reserved.
 //
 
+import CouchbaseLiteSwift
 import Foundation
 
 prefix operator <-
@@ -44,6 +45,14 @@ infix operator --=
 public func --=<T: PrimaryKey>(database: StorageDoneDatabase, elements: [T]) {
     do {
         try database.delete(elements: elements)
+    } catch let e {
+        print("DatabaseCore operator error: ", e)
+    }
+}
+
+public func --=<T>(database: StorageDoneDatabase, wrapper: (T.Type, ExpressionProtocol)) {
+    do {
+        try database.delete(T.self, wrapper.1)
     } catch let e {
         print("DatabaseCore operator error: ", e)
     }

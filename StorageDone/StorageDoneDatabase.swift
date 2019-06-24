@@ -117,9 +117,9 @@ public struct StorageDoneDatabase {
         return list
     }
     
-    public func get<T: Decodable>(whereExpressions: [ExpressionProtocol]) throws -> [T] {
+    public func get<T: Decodable>(expressions: [ExpressionProtocol]) throws -> [T] {
         var whereExpression = Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-        whereExpressions.forEach {
+        expressions.forEach {
             whereExpression = whereExpression.and($0)
         }
         
@@ -142,13 +142,13 @@ public struct StorageDoneDatabase {
         return list
     }
     
-    public func get<T: Decodable>(whereExpression: ExpressionProtocol) throws -> [T] {
+    public func get<T: Decodable>(_ expression: ExpressionProtocol) throws -> [T] {
         let query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
             .from(DataSource.database(database))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                .and(whereExpression))
+                .and(expression))
         
         var list = [T]()
         let decoder = JSONDecoder()
@@ -212,12 +212,12 @@ public struct StorageDoneDatabase {
         }
     }
     
-    public func delete<T>(_ elementType: T.Type, whereExpression: ExpressionProtocol) throws {
+    public func delete<T>(_ elementType: T.Type, _ expression: ExpressionProtocol) throws {
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
             .from(DataSource.database(database))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                .and(whereExpression))
+                .and(expression))
         
         for result in try query.execute() {
             if let id = result.string(forKey: "id"),
