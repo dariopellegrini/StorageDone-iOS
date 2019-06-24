@@ -172,7 +172,6 @@ and(expression1, expression2, expression3)
 or(expression1, expression2, expression3)
 
 // Usage
-
 do {
     let teachers: [Teacher] = try database.get(expression)
 } catch let e {
