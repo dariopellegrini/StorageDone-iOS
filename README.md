@@ -123,6 +123,9 @@ Get and delete commands can use queries. Queries can be build in different ways,
 "age" *<= 20
 "age".lessThanOrEqual(20)
 
+"age" <=&&<= (10, 20)
+"age".between((10, 20))
+
 // Is nil
 *?"name"
 "name".isNil
