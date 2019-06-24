@@ -6,6 +6,7 @@
 //  Copyright © 2019 Dario Pellegrini. All rights reserved.
 //
 
+import CouchbaseLiteSwift
 import Foundation
 import RxSwift
 
@@ -94,6 +95,18 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
+    func get<T: Decodable>(_ expression: ExpressionProtocol) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            do {
+                subscriber.onNext( try self.base.get(expression) )
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+    
     func delete<T>(type: T.Type, filter: [String:String]? = nil) -> Observable<Void> {
         return Observable.create {
             subscriber in
@@ -129,6 +142,18 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 try self.base.delete(elements: elements)
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func delete<T>(_ type: T.Type, _ expression: ExpressionProtocol) -> Observable<Void> {
+        return Observable.create {
+            subscriber in
+            do {
+                subscriber.onNext( try self.base.delete(type, expression) )
             } catch let e {
                 subscriber.onError(e)
             }
