@@ -28,6 +28,9 @@ extension String {
     public func lessThanOrEqual<T: Numeric>(_ element: T) -> ExpressionProtocol {
         return self *<= element
     }
+    public func between<T: Numeric>(_ elements: (T, T)) -> ExpressionProtocol {
+        return self <=&&<= elements
+    }
     public func inside(_ elements: [Any]) -> ExpressionProtocol {
         return self |> elements
     }
@@ -141,6 +144,11 @@ public func *<<T: Numeric>(key: String, element: T) -> ExpressionProtocol {
     return Expression.property(key).lessThan(Expression.value(element))
 }
 
+infix operator <=&&<=
+public func <=&&<=<T: Numeric>(key: String, elements: (T, T)) -> ExpressionProtocol {
+    return Expression.property(key).between(Expression.value(elements.0), and: Expression.value(elements.1))
+}
+
 // Dates
 public func *>=(key: String, date: Date) -> ExpressionProtocol {
     return Expression.property(key).greaterThanOrEqualTo(Expression.double(date.timeIntervalSinceReferenceDate))
@@ -159,7 +167,6 @@ public func *<(key: String, date: Date) -> ExpressionProtocol {
 }
 
 // Dates bewtween
-infix operator <=&&<=
 public func <=&&<=(key: String, dates: (Date, Date)) -> ExpressionProtocol {
     return Expression.property(key).between(Expression.double(dates.0.timeIntervalSinceReferenceDate), and: Expression.double(dates.1.timeIntervalSinceReferenceDate))
 }

@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "StorageDone"
-  spec.version      = "0.3.4"
+  spec.version      = "0.3.5"
   spec.summary      = "Swift library to make easy using local document-oriented databases in iOS apps."
 
   # This description is used to generate tags and improve search results.
