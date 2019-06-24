@@ -102,6 +102,81 @@ let filteredTeachers: [Teacher] = ["id":"id1"] <- database
 database --= teachers
 ```
 
+### Queries
+Get and delete commands can use queries. Queries can be build in different ways, using custom operator or extensions on parameter name
+```swift
+
+// Equal
+"id" *== "id1"
+"id".equal("id1")
+
+// Comparison (Numeric only)
+"age" *> 20
+"age".greaterThan(20)
+
+"age" *>= 20
+"age".greaterThanOrEqual(20)
+
+"age" *< 20
+"age".lessThan(20)
+
+"age" *<= 20
+"age".lessThanOrEqual(20)
+
+// Is nil
+*?"name"
+"name".isNil
+
+// Is not nil
+*!"name"
+"name".isNotNil
+
+// Value inside array
+"id" |> ["id1", "id2", "id3"]
+"id".inside(["id1", "id2", "id3"])
+
+// Array contains value
+"array" |< "A1"
+"array".contains("A1")
+
+// Like
+"name" *== "A%"
+"name".like("A%")
+
+// Regex
+"city" /== "\\bEng.*e\\b"
+"city".regex("\\bEng.*e\\b")
+
+// Dates comparisons
+"dateCreated" *> Date()
+"dateCreated".greaterThan(Date())
+
+"dateCreated" *>= Date()
+"dateCreated".greaterThanOrEqual(Date())
+
+"dateCreated" *< Date()
+"dateCreated".lessThan(Date())
+
+"dateCreated" *<= Date()
+"dateCreated".lessThanOrEqual(Date())
+
+"dateCreated" <=&&<= (Date().addingTimeInterval(500), Date().addingTimeInterval(1000))
+
+// And
+and(expression1, expression2, expression3)
+
+// Or
+or(expression1, expression2, expression3)
+
+// Usage
+
+do {
+    let teachers: [Teacher] = try database.get(expression)
+} catch let e {
+    print(e)
+}
+```
+
 ## Author
 
 Dario Pellegrini, pellegrini.dario.1303@gmail.com
