@@ -100,7 +100,7 @@ database --= teachers
 ```
 
 ### Queries
-Get and delete commands can use queries. Queries can be build in different ways, using custom operator or extensions on parameter name
+Get and delete commands can use queries. Queries can be built in different ways, using custom operator or extensions on parameter name
 ```swift
 
 // Equal
