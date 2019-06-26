@@ -1,9 +1,6 @@
 # StorageDone-iOS
 Swift library to make easy use local document-oriented databases in iOS apps.
 
-### Disclaimer
-This library is in development, therefore should not be used in a production context at the moment. Thank you.
-
 ### Installation
 To install StorageDone add this line to your Podfile
 ```
@@ -103,7 +100,7 @@ database --= teachers
 ```
 
 ### Queries
-Get and delete commands can use queries. Queries can be build in different ways, using custom operator or extensions on parameter name
+Get and delete commands can use queries. Queries can be built in different ways, using custom operator or extensions on parameter name
 ```swift
 
 // Equal
@@ -122,6 +119,9 @@ Get and delete commands can use queries. Queries can be build in different ways,
 
 "age" *<= 20
 "age".lessThanOrEqual(20)
+
+"age" <=&&<= (10, 20)
+"age".between((10, 20))
 
 // Is nil
 *?"name"
@@ -169,7 +169,6 @@ and(expression1, expression2, expression3)
 or(expression1, expression2, expression3)
 
 // Usage
-
 do {
     let teachers: [Teacher] = try database.get(expression)
 } catch let e {
