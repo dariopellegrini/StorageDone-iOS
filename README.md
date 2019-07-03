@@ -4,7 +4,7 @@ Swift library to make easy use local document-oriented databases in iOS apps.
 ### Installation
 To install StorageDone add this line to your Podfile
 ```
-pod 'StorageDone', :git => 'https://github.com/dariopellegrini/StorageDone-iOS'
+pod 'StorageDone'
 ```
 
 ### Usage
