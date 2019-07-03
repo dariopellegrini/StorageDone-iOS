@@ -128,7 +128,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 try self.base.delete(T.self)
-                try self.base.insertOrUpdate(element: elements)
+                try self.base.insertOrUpdate(elements: elements)
                 subscriber.onNext(elements)
             } catch let e {
                 subscriber.onError(e)
