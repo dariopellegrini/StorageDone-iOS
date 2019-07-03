@@ -123,6 +123,20 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
+    func deleteAllAndInsertOrUpdate<T: Encodable>(elements: [T]) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            do {
+                try self.base.delete(T.self)
+                try self.base.insertOrUpdate(element: elements)
+                subscriber.onNext(elements)
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+    
     func deleteAllAndInsert<T: Encodable>(elements: [T]) -> Observable<[T]> {
         return Observable.create {
             subscriber in
