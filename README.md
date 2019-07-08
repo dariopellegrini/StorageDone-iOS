@@ -176,6 +176,19 @@ do {
 }
 ```
 
+## Live queries
+Using live queries it's possible to observe every database change.
+```swift
+let liveQuery = try storage.live(Pet.self) {
+        livePets in
+        print("Count \(livePets.count)")
+        }
+
+In order to stop observing just call cancel on LiveQuery object.
+```swift
+liveQuery.cancel()
+``
+
 ## Author
 
 Dario Pellegrini, pellegrini.dario.1303@gmail.com
