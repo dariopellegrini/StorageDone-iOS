@@ -179,7 +179,6 @@ do {
 ## Live queries
 Using live queries it's possible to observe database changes.
 ```swift
-
 // All
 liveQuery = try storage.live(Teacher.self) {
     teachers in
@@ -201,7 +200,7 @@ liveQuery = try storage.live("id".equal("id1")) {
     (teachers: [Teacher]) in
         print(teachers)
 }
-
+```
 
 In order to stop observing just call cancel on LiveQuery object.
 ```swift
