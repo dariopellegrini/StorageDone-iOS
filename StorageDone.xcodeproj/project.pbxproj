@@ -10,6 +10,7 @@
 		6738DBA722AFB62F001E609C /* StorageDoneDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6738DBA622AFB62F001E609C /* StorageDoneDatabase.swift */; };
 		6740B9E422C0FB3B00FDDDA0 /* Queries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6740B9E322C0FB3B00FDDDA0 /* Queries.swift */; };
 		6762AD9C22AFFAE800830AC8 /* Dictionary+ExpressionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6762AD9B22AFFAE800830AC8 /* Dictionary+ExpressionProtocol.swift */; };
+		67D0331922D3851400BD3A58 /* LiveQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D0331822D3851400BD3A58 /* LiveQuery.swift */; };
 		A39F3407229850ED0086608B /* StorageDone.h in Headers */ = {isa = PBXBuildFile; fileRef = A39F3405229850ED0086608B /* StorageDone.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A39F34172298596C0086608B /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A39F34162298596C0086608B /* LICENSE */; };
 		A39F341C229860150086608B /* RxExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39F3419229860140086608B /* RxExtensions.swift */; };
@@ -22,6 +23,7 @@
 		6738DBA622AFB62F001E609C /* StorageDoneDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageDoneDatabase.swift; sourceTree = "<group>"; };
 		6740B9E322C0FB3B00FDDDA0 /* Queries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queries.swift; sourceTree = "<group>"; };
 		6762AD9B22AFFAE800830AC8 /* Dictionary+ExpressionProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+ExpressionProtocol.swift"; sourceTree = "<group>"; };
+		67D0331822D3851400BD3A58 /* LiveQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveQuery.swift; sourceTree = "<group>"; };
 		7D2E141BD39513FBE73599DB /* Pods-StorageDone.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StorageDone.debug.xcconfig"; path = "Pods/Target Support Files/Pods-StorageDone/Pods-StorageDone.debug.xcconfig"; sourceTree = "<group>"; };
 		A39F3402229850ED0086608B /* StorageDone.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StorageDone.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A39F3405229850ED0086608B /* StorageDone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StorageDone.h; sourceTree = "<group>"; };
@@ -85,6 +87,7 @@
 				6738DBA622AFB62F001E609C /* StorageDoneDatabase.swift */,
 				6762AD9B22AFFAE800830AC8 /* Dictionary+ExpressionProtocol.swift */,
 				6740B9E322C0FB3B00FDDDA0 /* Queries.swift */,
+				67D0331822D3851400BD3A58 /* LiveQuery.swift */,
 			);
 			path = StorageDone;
 			sourceTree = "<group>";
@@ -199,6 +202,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67D0331922D3851400BD3A58 /* LiveQuery.swift in Sources */,
 				6762AD9C22AFFAE800830AC8 /* Dictionary+ExpressionProtocol.swift in Sources */,
 				6738DBA722AFB62F001E609C /* StorageDoneDatabase.swift in Sources */,
 				6740B9E422C0FB3B00FDDDA0 /* Queries.swift in Sources */,
