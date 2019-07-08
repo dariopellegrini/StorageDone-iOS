@@ -209,7 +209,7 @@ liveQuery.cancel()
 
 ### RxSwit live queries
 
-Live query are also available through RxSwift extensions.
+Live queries are also available through RxSwift extensions.
 ```swift
 // All elements
 let disposable = database.rx.live(Teacher.self).subscribe(onNext: {
