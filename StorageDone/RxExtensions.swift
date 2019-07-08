@@ -174,6 +174,48 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             return Disposables.create()
         }
     }
+    
+    func live<T: Codable>(_ type: T.Type) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            var liveQuery: LiveQuery? = nil
+            do {
+                liveQuery = try self.base.live(type) {
+                    subscriber.onNext($0)
+                }
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create {
+                liveQuery?.cancel()
+            }
+        }
+    }
+    
+    func live<T: Codable>() -> Observable<[T]> {
+        return self.live(T.self)
+    }
+    
+    func live<T: Codable>(_ type: T.Type, expression: ExpressionProtocol) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            var liveQuery: LiveQuery? = nil
+            do {
+                liveQuery = try self.base.live(type, expression: expression) {
+                    subscriber.onNext($0)
+                }
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create {
+                liveQuery?.cancel()
+            }
+        }
+    }
+    
+    func live<T: Codable>(_ expression: ExpressionProtocol) -> Observable<[T]> {
+        return self.live(T.self, expression: expression)
+    }
 }
 
 public struct RxWrapper<Base> {
