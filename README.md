@@ -228,7 +228,7 @@ In order to stop observing just call cancel on LiveQuery object.
 liveQuery.cancel()
 ```
 
-Using RxSwift just dispose the disposable (or alternatively add it to a dispose bag).
+Using RxSwift just dispose the disposable or alternatively add it to a dispose bag.
 ```swift
 disposable.dispose()
 
