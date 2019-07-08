@@ -180,31 +180,60 @@ do {
 Using live queries it's possible to observe database changes.
 ```swift
 // All elements
-liveQuery = try storage.live(Teacher.self) {
+let liveQuery = try storage.live(Teacher.self) {
     teachers in
         print("Count \(teachers.count)")
 }
     
-liveQuery = try storage.live {
+let liveQuery = try storage.live {
     (teachers: [Teacher]) in
         print("Count \(teachers.count)")
 }
 
 // Elements with wuery
-liveQuery = try storage.live(Teacher.self, expression: "id".equal("id1")) {
+let liveQuery = try storage.live(Teacher.self, expression: "id".equal("id1")) {
     teachers in
         print(teachers)
 }
 
-liveQuery = try storage.live("id".equal("id1")) {
+let liveQuery = try storage.live("id".equal("id1")) {
     (teachers: [Teacher]) in
         print(teachers)
 }
+
+// RxSwift extensions
+let disposable = database.rx.live(Teacher.self).subscribe(onNext: {
+    teachers in
+    print("Count \(teachers.count)")
+})
+
+let disposable = database.rx.live().subscribe(onNext: {
+    (teachers: [Teacher]) in
+    print("Count \(teachers.count)")
+})
+
+let disposable = database.rx.live(Teacher.self, expression: "id".equal("id1")).subscribe(onNext: {
+    teachers in
+    print("Count \(teachers.count)")
+})
+
+let disposable = database.rx.live("id".equal("id1")).subscribe(onNext: {
+    (teachers: [Teacher]) in
+    print("Count \(teachers.count)")
+})
 ```
 
 In order to stop observing just call cancel on LiveQuery object.
 ```swift
 liveQuery.cancel()
+```
+
+Using RxSwift just dispose the disposable (or alternatively add it to a dispose bag).
+```swift
+disposable.dispose()
+
+// or
+disposable.disposed(by: disposeBag)
 ```
 
 ## Author
