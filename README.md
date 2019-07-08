@@ -179,7 +179,7 @@ do {
 ## Live queries
 Using live queries it's possible to observe database changes.
 ```swift
-// All
+// All elements
 liveQuery = try storage.live(Teacher.self) {
     teachers in
         print("Count \(teachers.count)")
@@ -190,7 +190,7 @@ liveQuery = try storage.live {
         print("Count \(teachers.count)")
 }
 
-// With query
+// Elements with wuery
 liveQuery = try storage.live(Teacher.self, expression: "id".equal("id1")) {
     teachers in
         print(teachers)
