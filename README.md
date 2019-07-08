@@ -177,17 +177,35 @@ do {
 ```
 
 ## Live queries
-Using live queries it's possible to observe every database change.
+Using live queries it's possible to observe database changes.
 ```swift
-let liveQuery = try storage.live(Pet.self) {
-        livePets in
-        print("Count \(livePets.count)")
-        }
+// All elements
+liveQuery = try storage.live(Teacher.self) {
+    teachers in
+        print("Count \(teachers.count)")
+}
+    
+liveQuery = try storage.live {
+    (teachers: [Teacher]) in
+        print("Count \(teachers.count)")
+}
+
+// Elements with wuery
+liveQuery = try storage.live(Teacher.self, expression: "id".equal("id1")) {
+    teachers in
+        print(teachers)
+}
+
+liveQuery = try storage.live("id".equal("id1")) {
+    (teachers: [Teacher]) in
+        print(teachers)
+}
+```
 
 In order to stop observing just call cancel on LiveQuery object.
 ```swift
 liveQuery.cancel()
-``
+```
 
 ## Author
 
