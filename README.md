@@ -205,7 +205,7 @@ liveQuery = try storage.live("id".equal("id1")) {
 In order to stop observing just call cancel on LiveQuery object.
 ```swift
 liveQuery.cancel()
-``
+```
 
 ## Author
 
