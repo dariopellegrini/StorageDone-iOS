@@ -19,6 +19,8 @@ public extension StorageDoneDatabase {
 }
 
 public extension RxWrapper where Base == StorageDoneDatabase {
+    
+    // MARK: - Insert
     func insert<T: Encodable>(element: T) -> Observable<T> {
         return Observable.create {
             subscriber in
@@ -45,6 +47,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
+    // MARK: - Insert or update
     func insertOrUpdate<T: Encodable>(element: T) -> Observable<T> {
         return Observable.create {
             subscriber in
@@ -71,6 +74,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
+    // MARK: - Read
     func get<T: Decodable>() -> Observable<[T]> {
         return Observable.create {
             subscriber in
@@ -107,6 +111,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
+    // MARK: - Delete
     func delete<T>(type: T.Type, filter: [String:String]? = nil) -> Observable<Void> {
         return Observable.create {
             subscriber in
@@ -175,6 +180,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
+    // MARK: - Live
     func live<T: Codable>(_ type: T.Type) -> Observable<[T]> {
         return Observable.create {
             subscriber in
