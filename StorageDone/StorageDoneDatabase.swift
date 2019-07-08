@@ -245,7 +245,7 @@ public struct StorageDoneDatabase {
     }
     
     // MARK: - Live
-    public func live<T: Codable>(_ classType: T.Type, _ closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+    public func live<T: Codable>(_ classType: T.Type, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
         let query = QueryBuilder
             .select(SelectResult.all())
             .from(DataSource.database(database))
@@ -269,6 +269,41 @@ public struct StorageDoneDatabase {
         _ = try query.execute()
         
         return LiveQuery(query: query, token: token)
+    }
+    
+    public func live<T: Codable>(_ closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        return try live(T.self, closure: closure)
+    }
+    
+    public func live<T: Codable>(_ classType: T.Type, expression: ExpressionProtocol, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        let query = QueryBuilder
+            .select(SelectResult.all(),
+                    SelectResult.expression(Meta.id))
+            .from(DataSource.database(database))
+            .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
+                .and(expression))
+        
+        let token = query.addChangeListener { (change) in
+            guard let results = change.results else { return }
+            var list = [T]()
+            let decoder = JSONDecoder()
+            for result in results {
+                if let singleDictionary = result.toDictionary()[self.name],
+                    let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
+                    if let element = try? decoder.decode(T.self, from: jsonData) {
+                        list.append(element)
+                    }
+                }
+            }
+            closure(list)
+        }
+        _ = try query.execute()
+        
+        return LiveQuery(query: query, token: token)
+    }
+    
+    public func live<T: Codable>(_ expression: ExpressionProtocol, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        return try live(T.self, expression: expression, closure: closure)
     }
 }
 
