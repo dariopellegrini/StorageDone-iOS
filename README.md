@@ -140,7 +140,7 @@ Get and delete commands can use queries. Queries can be built in different ways,
 "array".contains("A1")
 
 // Like
-"name" *== "A%"
+"name" **= "A%"
 "name".like("A%")
 
 // Regex
