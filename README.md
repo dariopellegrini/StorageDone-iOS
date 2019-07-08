@@ -190,7 +190,7 @@ let liveQuery = try storage.live {
         print("Count \(teachers.count)")
 }
 
-// Elements with wuery
+// Elements with query
 let liveQuery = try storage.live(Teacher.self, expression: "id".equal("id1")) {
     teachers in
         print(teachers)
@@ -200,8 +200,18 @@ let liveQuery = try storage.live("id".equal("id1")) {
     (teachers: [Teacher]) in
         print(teachers)
 }
+```
 
-// RxSwift extensions
+In order to stop observing just call cancel on LiveQuery object.
+```swift
+liveQuery.cancel()
+```
+
+### RxSwit live queries
+
+Live query are also available through RxSwift extensions.
+```swift
+// All elements
 let disposable = database.rx.live(Teacher.self).subscribe(onNext: {
     teachers in
     print("Count \(teachers.count)")
@@ -212,6 +222,7 @@ let disposable = database.rx.live().subscribe(onNext: {
     print("Count \(teachers.count)")
 })
 
+// Elements with query
 let disposable = database.rx.live(Teacher.self, expression: "id".equal("id1")).subscribe(onNext: {
     teachers in
     print("Count \(teachers.count)")
@@ -223,12 +234,7 @@ let disposable = database.rx.live("id".equal("id1")).subscribe(onNext: {
 })
 ```
 
-In order to stop observing just call cancel on LiveQuery object.
-```swift
-liveQuery.cancel()
-```
-
-Using RxSwift just dispose the disposable or alternatively add it to a dispose bag.
+To stop observing changes just dispose the disposable or alternatively add it to a dispose bag.
 ```swift
 disposable.dispose()
 
