@@ -239,6 +239,7 @@ To stop observing changes just dispose the disposable or alternatively add it to
 disposable.dispose()
 
 // or
+
 disposable.disposed(by: disposeBag)
 ```
 
