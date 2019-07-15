@@ -207,7 +207,7 @@ In order to stop observing just call cancel on LiveQuery object.
 liveQuery.cancel()
 ```
 
-### RxSwit live queries
+### RxSwift live queries
 
 Live queries are also available through RxSwift extensions.
 ```swift
