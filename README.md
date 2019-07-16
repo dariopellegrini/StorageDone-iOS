@@ -75,9 +75,9 @@ database.rx.insert(teachers)
 
 database.rx.get()
 
-database.rx.get(mapOf("id" to "id1")
+database.rx.get(["id":"id1"])
 
-database.rx.delete(mapOf("id" to "id2"))
+database.rx.delete(["id":"id2"])
 
 database.rx.deleteAllAndInsert(teachers)
 
