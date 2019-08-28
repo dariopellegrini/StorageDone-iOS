@@ -244,7 +244,7 @@ disposable.disposed(by: disposeBag)
 ```
 
 ## Advanced queries
-Using advanced queries lets to specify filtering expression, orderings logic and priority and limit and skip values.
+Using advanced queries lets to specify filtering expression, ordering logic and priority, limit and skip values.
 All of these parameters are optional. The only limitation is that skip is ignored if limit parameter is not present.
 ```swift
 
