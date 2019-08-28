@@ -256,14 +256,14 @@ try database.get {
 }
 
 let teachers: [Teacher] = {
-    $0.expression = or("id".equal("id1"), "name".equal("Silvia3"), "name".equal("Silvia1"))
+    $0.expression = or("id".equal("id1"), "name".equal("Silvia"), "name".equal("John"))
     $0.orderings = ["name".ascending, "date".descending]
     $0.limit = 3
     $0.skip = 2
  } <- databaseCore
  
 try database.live({
-    $0.expression = or("id".equal("id1"), "name".equal("Silvia3"), "name".equal("Silvia1"))
+    $0.expression = or("id".equal("id1"), "name".equal("Silvia"), "name".equal("John"))
     $0.orderings = ["name".ascending, "date".descending]
     $0.limit = 3
     $0.skip = 2
