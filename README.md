@@ -243,6 +243,35 @@ disposable.dispose()
 disposable.disposed(by: disposeBag)
 ```
 
+## Advanced queries
+Using advanced queries lets to specify filtering expression, orderings logic and priority and limit and skip values.
+```swift
+
+try database.get {
+    $0.expression = or("id".equal("id1"), "name".equal("Silvia"), "name".equal("John"))
+    $0.orderings = ["name".ascending, "date".descending]
+    $0.limit = 3
+    $0.skip = 2
+}
+
+let databaseTeachers2: [Teacher] = {
+    $0.expression = or("id".equal("id1"), "name".equal("Silvia3"), "name".equal("Silvia1"))
+    $0.orderings = ["name".ascending, "date".descending]
+    $0.limit = 3
+    $0.skip = 2
+ } <- databaseCore
+ 
+try storage.live(Teacher.self, using: {
+    $0.expression = or("id".equal("id1"), "name".equal("Silvia3"), "name".equal("Silvia1"))
+    $0.orderings = ["name".ascending, "date".descending]
+    $0.limit = 3
+    $0.skip = 2
+}) {
+    liveTeachers in
+    print("Count \(liveTeachers.count)")
+}
+```
+
 ## Author
 
 Dario Pellegrini, pellegrini.dario.1303@gmail.com
