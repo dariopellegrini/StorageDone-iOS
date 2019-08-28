@@ -75,9 +75,9 @@ database.rx.insert(teachers)
 
 database.rx.get()
 
-database.rx.get(mapOf("id" to "id1")
+database.rx.get(["id":"id1"])
 
-database.rx.delete(mapOf("id" to "id2"))
+database.rx.delete(["id":"id2"])
 
 database.rx.deleteAllAndInsert(teachers)
 
@@ -207,7 +207,7 @@ In order to stop observing just call cancel on LiveQuery object.
 liveQuery.cancel()
 ```
 
-### RxSwit live queries
+### RxSwift live queries
 
 Live queries are also available through RxSwift extensions.
 ```swift
@@ -239,6 +239,7 @@ To stop observing changes just dispose the disposable or alternatively add it to
 disposable.dispose()
 
 // or
+
 disposable.disposed(by: disposeBag)
 ```
 
