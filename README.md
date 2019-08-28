@@ -254,20 +254,20 @@ try database.get {
     $0.skip = 2
 }
 
-let databaseTeachers2: [Teacher] = {
+let teachers: [Teacher] = {
     $0.expression = or("id".equal("id1"), "name".equal("Silvia3"), "name".equal("Silvia1"))
     $0.orderings = ["name".ascending, "date".descending]
     $0.limit = 3
     $0.skip = 2
  } <- databaseCore
  
-try storage.live(Teacher.self, using: {
+try database.live({
     $0.expression = or("id".equal("id1"), "name".equal("Silvia3"), "name".equal("Silvia1"))
     $0.orderings = ["name".ascending, "date".descending]
     $0.limit = 3
     $0.skip = 2
 }) {
-    liveTeachers in
+    (liveTeachers: [Teacher]) in
     print("Count \(liveTeachers.count)")
 }
 ```
