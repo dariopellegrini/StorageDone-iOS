@@ -15,9 +15,18 @@ public prefix func <-<T: Decodable>(database: StorageDoneDatabase) -> [T] {
 }
 
 infix operator <-
-public func <-<T: Decodable>(query: [String:Any], database: StorageDoneDatabase) -> [T] {
+public func <-<T: Decodable>(expressions: ExpressionProtocol, database: StorageDoneDatabase) -> [T] {
     do {
-        return try database.get(filter: query)
+        return try database.get(expressions)
+    } catch let e {
+        print("DatabaseCore operator error: ", e)
+        return []
+    }
+}
+
+public func <-<T: Decodable>(closure: (AdvancedQuery) -> (), database: StorageDoneDatabase) -> [T] {
+    do {
+        return try database.get(using: closure)
     } catch let e {
         print("DatabaseCore operator error: ", e)
         return []
@@ -57,3 +66,4 @@ public func --=<T>(database: StorageDoneDatabase, wrapper: (T.Type, ExpressionPr
         print("DatabaseCore operator error: ", e)
     }
 }
+

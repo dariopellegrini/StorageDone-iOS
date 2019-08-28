@@ -87,11 +87,11 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func get<T: Decodable>(filter: [String:String]) -> Observable<[T]> {
+    func get<T: Decodable>(_ expression: ExpressionProtocol) -> Observable<[T]> {
         return Observable.create {
             subscriber in
             do {
-                subscriber.onNext( try self.base.get(filter: filter) )
+                subscriber.onNext( try self.base.get(expression) )
             } catch let e {
                 subscriber.onError(e)
             }
@@ -99,11 +99,11 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func get<T: Decodable>(_ expression: ExpressionProtocol) -> Observable<[T]> {
+    func get<T: Decodable>(using closure: @escaping (AdvancedQuery) -> ()) -> Observable<[T]> {
         return Observable.create {
             subscriber in
             do {
-                subscriber.onNext( try self.base.get(expression) )
+                subscriber.onNext( try self.base.get(using: closure) )
             } catch let e {
                 subscriber.onError(e)
             }
@@ -221,6 +221,27 @@ public extension RxWrapper where Base == StorageDoneDatabase {
     
     func live<T: Codable>(_ expression: ExpressionProtocol) -> Observable<[T]> {
         return self.live(T.self, expression: expression)
+    }
+    
+    func live<T: Codable>(_ type: T.Type, using: @escaping (AdvancedQuery) -> ()) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            var liveQuery: LiveQuery? = nil
+            do {
+                liveQuery = try self.base.live(type, using: using) {
+                    subscriber.onNext($0)
+                }
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create {
+                liveQuery?.cancel()
+            }
+        }
+    }
+    
+    func live<T: Codable>(_ using: @escaping (AdvancedQuery) -> ()) -> Observable<[T]> {
+        return self.live(T.self, using: using)
     }
 }
 

@@ -95,53 +95,6 @@ public struct StorageDoneDatabase {
         return list
     }
     
-    public func get<T: Decodable>(filter: [String:Any]) throws -> [T] {
-        let whereExpression = filter.whereExpression(startingExpression: Expression.property(type).equalTo(Expression.string(String(describing: T.self))))
-        
-        let query = QueryBuilder
-            .select(SelectResult.all(),
-                    SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
-            .where(whereExpression)
-        
-        var list = [T]()
-        let decoder = JSONDecoder()
-        for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[name] {
-                let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
-                if let element = try? decoder.decode(T.self, from: jsonData) {
-                    list.append(element)
-                }
-            }
-        }
-        return list
-    }
-    
-    public func get<T: Decodable>(expressions: [ExpressionProtocol]) throws -> [T] {
-        var whereExpression = Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-        expressions.forEach {
-            whereExpression = whereExpression.and($0)
-        }
-        
-        let query = QueryBuilder
-            .select(SelectResult.all(),
-                    SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
-            .where(whereExpression)
-        
-        var list = [T]()
-        let decoder = JSONDecoder()
-        for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[name] {
-                let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
-                if let element = try? decoder.decode(T.self, from: jsonData) {
-                    list.append(element)
-                }
-            }
-        }
-        return list
-    }
-    
     public func get<T: Decodable>(_ expression: ExpressionProtocol) throws -> [T] {
         let query = QueryBuilder
             .select(SelectResult.all(),
@@ -163,7 +116,84 @@ public struct StorageDoneDatabase {
         return list
     }
     
+    public func get<T: Decodable>(_ expression: ExpressionProtocol, _ orderings: [OrderingProtocol]) throws -> [T] {
+        let query = QueryBuilder
+            .select(SelectResult.all(),
+                    SelectResult.expression(Meta.id))
+            .from(DataSource.database(database))
+            .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
+                .and(expression))
+            .orderBy(orderings)
+        
+        var list = [T]()
+        let decoder = JSONDecoder()
+        for result in try query.execute() {
+            if let singleDictionary = result.toDictionary()[name] {
+                let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
+                if let element = try? decoder.decode(T.self, from: jsonData) {
+                    list.append(element)
+                }
+            }
+        }
+        return list
+    }
+    
+    // MARK: - Get with advanced queries
+    public func get<T: Decodable>(using closure: (AdvancedQuery) -> ()) throws -> [T] {
+        
+        let advancedQuery = AdvancedQuery()
+        closure(advancedQuery)
+        
+        var query: Query = QueryBuilder
+            .select(SelectResult.all(),
+                    SelectResult.expression(Meta.id))
+            .from(DataSource.database(database))
+
+        if let from = query as? From {
+            if let expression = advancedQuery.expression {
+                query = from.where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
+                    .and(expression))
+            } else {
+                query = from.where(Expression.property(type)
+                    .equalTo(Expression.string(String(describing: T.self))))
+            }
+        }
+
+        if let whereQuery = query as? Where,
+            let orderings = advancedQuery.orderings {
+            query = whereQuery.orderBy(orderings)
+        }
+
+        if let limit = advancedQuery.limit,
+            let skip = advancedQuery.skip {
+            if let whereQuery = query as? Where {
+                query = whereQuery.limit(Expression.int(limit), offset: Expression.int(skip))
+            } else if let orderQuery = query as? OrderBy {
+                query = orderQuery.limit(Expression.int(limit), offset: Expression.int(skip))
+            }
+        } else if let limit = advancedQuery.limit{
+            if let whereQuery = query as? Where {
+                query = whereQuery.limit(Expression.int(limit))
+            } else if let orderQuery = query as? OrderBy {
+                query = orderQuery.limit(Expression.int(limit))
+            }
+        }
+        
+        var list = [T]()
+        let decoder = JSONDecoder()
+        for result in try query.execute() {
+            if let singleDictionary = result.toDictionary()[name] {
+                let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
+                if let element = try? decoder.decode(T.self, from: jsonData) {
+                    list.append(element)
+                }
+            }
+        }
+        return list
+    }
+    
     // MARK: - Delete
+    
     public func delete<T>(_ elementType: T.Type) throws{
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
@@ -304,6 +334,70 @@ public struct StorageDoneDatabase {
     
     public func live<T: Codable>(_ expression: ExpressionProtocol, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
         return try live(T.self, expression: expression, closure: closure)
+    }
+    
+    // MARK: - Live with advanced queries
+    public func live<T: Codable>(_ classType: T.Type, using: (AdvancedQuery) -> (), closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        
+        let advancedQuery = AdvancedQuery()
+        using(advancedQuery)
+        
+        var query: Query = QueryBuilder
+            .select(SelectResult.all(),
+                    SelectResult.expression(Meta.id))
+            .from(DataSource.database(database))
+        
+        if let from = query as? From {
+            if let expression = advancedQuery.expression {
+                query = from.where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
+                    .and(expression))
+            } else {
+                query = from.where(Expression.property(type)
+                    .equalTo(Expression.string(String(describing: T.self))))
+            }
+        }
+        
+        if let whereQuery = query as? Where,
+            let orderings = advancedQuery.orderings {
+            query = whereQuery.orderBy(orderings)
+        }
+        
+        if let limit = advancedQuery.limit,
+            let skip = advancedQuery.skip {
+            if let whereQuery = query as? Where {
+                query = whereQuery.limit(Expression.int(limit), offset: Expression.int(skip))
+            } else if let orderQuery = query as? OrderBy {
+                query = orderQuery.limit(Expression.int(limit), offset: Expression.int(skip))
+            }
+        } else if let limit = advancedQuery.limit{
+            if let whereQuery = query as? Where {
+                query = whereQuery.limit(Expression.int(limit))
+            } else if let orderQuery = query as? OrderBy {
+                query = orderQuery.limit(Expression.int(limit))
+            }
+        }
+        
+        let token = query.addChangeListener { (change) in
+            guard let results = change.results else { return }
+            var list = [T]()
+            let decoder = JSONDecoder()
+            for result in results {
+                if let singleDictionary = result.toDictionary()[self.name],
+                    let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
+                    if let element = try? decoder.decode(T.self, from: jsonData) {
+                        list.append(element)
+                    }
+                }
+            }
+            closure(list)
+        }
+        _ = try query.execute()
+        
+        return LiveQuery(query: query, token: token)
+    }
+    
+    public func live<T: Codable>(_ using: (AdvancedQuery) -> (), closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        return try live(T.self, using: using, closure: closure)
     }
 }
 
