@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/dariopellegrini/StorageDone-iOS/master/storagedown.png)
+![](https://raw.githubusercontent.com/dariopellegrini/StorageDone-iOS/master/storagedown.svg)
 # StorageDone-iOS
 Swift library to make easy use local document-oriented databases in iOS apps.
 
