@@ -278,6 +278,12 @@ try database.live({
 
 Dario Pellegrini, pellegrini.dario.1303@gmail.com
 
+## Credits
+[CouchbaseLite iOS](https://github.com/couchbase/couchbase-lite-ios)
+
+## Logo
+[Antonio Petruccelli](mailto://info@apdesigner.it))
+
 ## License
 
 StorageDone-iOS is available under the MIT license. See the LICENSE file for more info.
