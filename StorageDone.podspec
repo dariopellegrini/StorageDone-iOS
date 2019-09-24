@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "StorageDone"
-  spec.version       = "0.6"
+  spec.version       = "0.6.1"
   spec.summary      = "Swift library to make easy using local document-oriented databases in iOS apps."
 
   # This description is used to generate tags and improve search results.
@@ -72,7 +72,7 @@ Pod::Spec.new do |spec|
   # spec.watchos.deployment_target = "2.0"
   # spec.tvos.deployment_target = "9.0"
 
-  spec.dependency 'CouchbaseLite-Swift', '~> 2.5.0'
+  # spec.dependency 'CouchbaseLite-Swift', '~> 2.5.0'
   spec.dependency 'RxSwift'
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -92,7 +92,7 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files = "StorageDone/**/*.{swift}"
+  spec.source_files = 'StorageDone/**/*.{swift}'
   # spec.source_files  = "Classes", "Classes/**/*.{h,m}"
   # spec.exclude_files = "Classes/Exclude"
 
@@ -119,7 +119,8 @@ Pod::Spec.new do |spec|
   #  the lib prefix of their name.
   #
 
-  # spec.framework  = "SomeFramework"
+   spec.framework  = "CouchbaseLiteSwift"
+spec.vendored_frameworks = 'StorageDone/CouchbaseLiteSwift.framework'
   # spec.frameworks = "SomeFramework", "AnotherFramework"
 
   # spec.library   = "iconv"

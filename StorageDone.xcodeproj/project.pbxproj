@@ -11,6 +11,7 @@
 		6738DBA722AFB62F001E609C /* StorageDoneDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6738DBA622AFB62F001E609C /* StorageDoneDatabase.swift */; };
 		6740B9E422C0FB3B00FDDDA0 /* Queries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6740B9E322C0FB3B00FDDDA0 /* Queries.swift */; };
 		6762AD9C22AFFAE800830AC8 /* DictionaryExtenions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6762AD9B22AFFAE800830AC8 /* DictionaryExtenions.swift */; };
+		67635C85233A0AC800142B39 /* CouchbaseLiteSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67635C84233A0AC800142B39 /* CouchbaseLiteSwift.framework */; };
 		67A5FB0E2316C7040099A681 /* AdvancedQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A5FB0D2316C7040099A681 /* AdvancedQuery.swift */; };
 		67D0331922D3851400BD3A58 /* LiveQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D0331822D3851400BD3A58 /* LiveQuery.swift */; };
 		A39F3407229850ED0086608B /* StorageDone.h in Headers */ = {isa = PBXBuildFile; fileRef = A39F3405229850ED0086608B /* StorageDone.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -26,6 +27,10 @@
 		6738DBA622AFB62F001E609C /* StorageDoneDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageDoneDatabase.swift; sourceTree = "<group>"; };
 		6740B9E322C0FB3B00FDDDA0 /* Queries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queries.swift; sourceTree = "<group>"; };
 		6762AD9B22AFFAE800830AC8 /* DictionaryExtenions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryExtenions.swift; sourceTree = "<group>"; };
+		67635C702339FDDA00142B39 /* CouchbaseLiteSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CouchbaseLiteSwift.framework; path = "../Downloads/CBL/couchbase-lite-ios/outputDir/CBL Swift/iOS/CouchbaseLiteSwift.framework"; sourceTree = "<group>"; };
+		67635C722339FE7500142B39 /* CBL Swift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "CBL Swift"; path = "../Downloads/CBL/couchbase-lite-ios/outputDir/CBL Swift"; sourceTree = "<group>"; };
+		67635C742339FE8F00142B39 /* iOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = iOS; path = "../Downloads/CBL/couchbase-lite-ios/outputDir/CBL Swift/iOS"; sourceTree = "<group>"; };
+		67635C84233A0AC800142B39 /* CouchbaseLiteSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CouchbaseLiteSwift.framework; path = "../../Downloads/CBL/couchbase-lite-ios/outputDir/CBL Swift/iOS/CouchbaseLiteSwift.framework"; sourceTree = "<group>"; };
 		67A5FB0D2316C7040099A681 /* AdvancedQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedQuery.swift; sourceTree = "<group>"; };
 		67D0331822D3851400BD3A58 /* LiveQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveQuery.swift; sourceTree = "<group>"; };
 		7D2E141BD39513FBE73599DB /* Pods-StorageDone.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StorageDone.debug.xcconfig"; path = "Pods/Target Support Files/Pods-StorageDone/Pods-StorageDone.debug.xcconfig"; sourceTree = "<group>"; };
@@ -45,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67635C85233A0AC800142B39 /* CouchbaseLiteSwift.framework in Frameworks */,
 				BBF81DC8B18C45EAF9768928 /* Pods_StorageDone.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,17 +89,18 @@
 		A39F3404229850ED0086608B /* StorageDone */ = {
 			isa = PBXGroup;
 			children = (
+				67635C84233A0AC800142B39 /* CouchbaseLiteSwift.framework */,
 				A39F341A229860140086608B /* Operators.swift */,
 				A39F3418229860140086608B /* PrimaryKey.swift */,
 				A39F3419229860140086608B /* RxExtensions.swift */,
-				A39F3405229850ED0086608B /* StorageDone.h */,
-				A39F3406229850ED0086608B /* Info.plist */,
 				6738DBA622AFB62F001E609C /* StorageDoneDatabase.swift */,
 				6762AD9B22AFFAE800830AC8 /* DictionaryExtenions.swift */,
 				6740B9E322C0FB3B00FDDDA0 /* Queries.swift */,
 				67D0331822D3851400BD3A58 /* LiveQuery.swift */,
 				670D52592311C8F000FA0DB7 /* StringExtensions.swift */,
 				67A5FB0D2316C7040099A681 /* AdvancedQuery.swift */,
+				A39F3405229850ED0086608B /* StorageDone.h */,
+				A39F3406229850ED0086608B /* Info.plist */,
 			);
 			path = StorageDone;
 			sourceTree = "<group>";
@@ -101,6 +108,9 @@
 		F4AC59631EE62C1D3631426C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				67635C742339FE8F00142B39 /* iOS */,
+				67635C722339FE7500142B39 /* CBL Swift */,
+				67635C702339FDDA00142B39 /* CouchbaseLiteSwift.framework */,
 				D8505C67D33317DABA911B8E /* Pods_StorageDone.framework */,
 			);
 			name = Frameworks;
@@ -357,6 +367,12 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/StorageDone",
+					"$(PROJECT_DIR)/StorageDone/src",
+				);
 				INFOPLIST_FILE = StorageDone/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -385,6 +401,12 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/StorageDone",
+					"$(PROJECT_DIR)/StorageDone/src",
+				);
 				INFOPLIST_FILE = StorageDone/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
