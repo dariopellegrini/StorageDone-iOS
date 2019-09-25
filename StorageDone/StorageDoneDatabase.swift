@@ -17,6 +17,12 @@ public struct StorageDoneDatabase {
     private let type = "StorageDoneType"
     
     public init(name: String = "StorageDone") {
+        if Database.log.file.config == nil {
+            let tempFolder = NSTemporaryDirectory().appending("cbllog")
+            Database.log.file.config = LogFileConfiguration(directory: tempFolder)
+            Database.log.file.level = .error
+        }
+        
         self.name = name
         if let path = Bundle.main.path(forResource: name, ofType: "cblite2"),
             !Database.exists(withName: name) {
@@ -27,7 +33,6 @@ public struct StorageDoneDatabase {
             }
         }
         
-        // 2
         do {
             self.database = try Database(name: name)
         } catch {
