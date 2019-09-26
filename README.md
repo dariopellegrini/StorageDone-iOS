@@ -274,6 +274,24 @@ try database.live({
 }
 ```
 
+## Fulltext
+Fulltext search needs to be configured with the parameters' name that should be indexed.
+After that, a query can be performed with search text and with an optional advanced query.
+
+```swift
+// Define the index
+try database.fulltextIndex(Teacher.self, values: "id", "name", "surname", "age", "cv")
+
+// All results
+let teachers: [Teacher] = try self.database.search(text: text)
+
+// Results with advanced query
+let teachers: [Teacher] = try self.database.search(text: text) {
+    $0.orderings = ["age".descending]
+}
+
+```
+
 ## Author
 
 Dario Pellegrini, pellegrini.dario.1303@gmail.com
