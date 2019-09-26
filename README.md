@@ -274,7 +274,7 @@ try database.live({
 }
 ```
 
-## Fulltext
+## Fulltext search
 Fulltext search needs to be configured with the parameters' name that should be indexed.
 After that, a query can be performed with search text and with an optional advanced query.
 
