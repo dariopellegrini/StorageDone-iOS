@@ -17,6 +17,12 @@ public struct StorageDoneDatabase {
     private let type = "StorageDoneType"
     
     public init(name: String = "StorageDone") {
+        if Database.log.file.config == nil {
+            let tempFolder = NSTemporaryDirectory().appending("cbllog")
+            Database.log.file.config = LogFileConfiguration(directory: tempFolder)
+            Database.log.file.level = .error
+        }
+        
         self.name = name
         if let path = Bundle.main.path(forResource: name, ofType: "cblite2"),
             !Database.exists(withName: name) {
@@ -27,7 +33,6 @@ public struct StorageDoneDatabase {
             }
         }
         
-        // 2
         do {
             self.database = try Database(name: name)
         } catch {
@@ -53,11 +58,13 @@ public struct StorageDoneDatabase {
     }
     
     public func insertOrUpdate<T: Encodable>(elements: [T]) throws {
-        try elements.forEach {
-            try insertOrUpdate(element: $0)
+        try database.inBatch {
+            try elements.forEach {
+                try insertOrUpdate(element: $0)
+            }
         }
     }
-    
+
     // MARK: - Insert
     public func insert<T: Encodable>(element: T) throws {
         let dictionary = try element.asDictionary()
@@ -70,8 +77,10 @@ public struct StorageDoneDatabase {
     }
     
     public func insert<T: Encodable>(elements: [T]) throws {
-        try elements.forEach {
-            try insert(element: $0)
+        try database.inBatch {
+            try elements.forEach {
+                try insert(element: $0)
+            }
         }
     }
     
@@ -399,6 +408,91 @@ public struct StorageDoneDatabase {
     public func live<T: Codable>(_ using: (AdvancedQuery) -> (), closure: @escaping ([T]) -> ()) throws -> LiveQuery {
         return try live(T.self, using: using, closure: closure)
     }
+    
+    // MARK: - Fulltext
+    public func fulltextIndex<T>(_ type: T.Type, values: String...) throws {
+        try database.createIndex(IndexBuilder.fullTextIndex(items: values.map {
+            FullTextIndexItem.property($0)
+        }), withName: "\(String(describing: T.self))-index")
+    }
+    
+    public func search<T: Decodable>(text: String) throws -> [T] {
+        let query = QueryBuilder
+            .select(SelectResult.all())
+            .from(DataSource.database(database))
+            .where(
+                Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
+                .and(FullTextExpression.index("\(String(describing: T.self))-index").match("'\(text)'"))
+        )
+        
+        var list = [T]()
+        let decoder = JSONDecoder()
+        for result in try query.execute() {
+            if let singleDictionary = result.toDictionary()[name],
+                let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
+                if let element = try? decoder.decode(T.self, from: jsonData) {
+                    list.append(element)
+                }
+            }
+        }
+        return list
+    }
+    
+    public func search<T: Decodable>(text: String, using: (AdvancedQuery) -> ()) throws -> [T] {
+        
+        let advancedQuery = AdvancedQuery()
+        using(advancedQuery)
+        
+        var query: Query = QueryBuilder
+            .select(SelectResult.all(),
+                    SelectResult.expression(Meta.id))
+            .from(DataSource.database(database))
+        
+        if let from = query as? From {
+            if let expression = advancedQuery.expression {
+                query = from.where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
+                    .and(FullTextExpression.index("\(String(describing: T.self))-index").match("'\(text)'"))
+                    .and(expression))
+            } else {
+                query = from.where(Expression.property(type)
+                    .equalTo(Expression.string(String(describing: T.self)))
+                    .and(FullTextExpression.index("\(String(describing: T.self))-index").match("'\(text)'"))
+                )
+            }
+        }
+        
+        if let whereQuery = query as? Where,
+            let orderings = advancedQuery.orderings {
+            query = whereQuery.orderBy(orderings)
+        }
+        
+        if let limit = advancedQuery.limit,
+            let skip = advancedQuery.skip {
+            if let whereQuery = query as? Where {
+                query = whereQuery.limit(Expression.int(limit), offset: Expression.int(skip))
+            } else if let orderQuery = query as? OrderBy {
+                query = orderQuery.limit(Expression.int(limit), offset: Expression.int(skip))
+            }
+        } else if let limit = advancedQuery.limit{
+            if let whereQuery = query as? Where {
+                query = whereQuery.limit(Expression.int(limit))
+            } else if let orderQuery = query as? OrderBy {
+                query = orderQuery.limit(Expression.int(limit))
+            }
+        }
+        
+        var list = [T]()
+        let decoder = JSONDecoder()
+        for result in try query.execute() {
+            if let singleDictionary = result.toDictionary()[name],
+                let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
+                if let element = try? decoder.decode(T.self, from: jsonData) {
+                    list.append(element)
+                }
+            }
+        }
+        return list
+    }
 }
 
 extension Encodable {
@@ -410,3 +504,4 @@ extension Encodable {
         return dictionary
     }
 }
+
