@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		40F8663F2379A050006635CA /* CouchbaseLiteSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40F8663E2379A050006635CA /* CouchbaseLiteSwift.framework */; };
 		670D525A2311C8F000FA0DB7 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670D52592311C8F000FA0DB7 /* StringExtensions.swift */; };
 		6738DBA722AFB62F001E609C /* StorageDoneDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6738DBA622AFB62F001E609C /* StorageDoneDatabase.swift */; };
 		6740B9E422C0FB3B00FDDDA0 /* Queries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6740B9E322C0FB3B00FDDDA0 /* Queries.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		40F8663E2379A050006635CA /* CouchbaseLiteSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLiteSwift.framework; sourceTree = "<group>"; };
 		670D52592311C8F000FA0DB7 /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		6738DBA622AFB62F001E609C /* StorageDoneDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageDoneDatabase.swift; sourceTree = "<group>"; };
 		6740B9E322C0FB3B00FDDDA0 /* Queries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queries.swift; sourceTree = "<group>"; };
@@ -45,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40F8663F2379A050006635CA /* CouchbaseLiteSwift.framework in Frameworks */,
 				BBF81DC8B18C45EAF9768928 /* Pods_StorageDone.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,6 +86,7 @@
 		A39F3404229850ED0086608B /* StorageDone */ = {
 			isa = PBXGroup;
 			children = (
+				40F8663E2379A050006635CA /* CouchbaseLiteSwift.framework */,
 				A39F341A229860140086608B /* Operators.swift */,
 				A39F3418229860140086608B /* PrimaryKey.swift */,
 				A39F3419229860140086608B /* RxExtensions.swift */,
@@ -353,10 +357,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = SDK36A53QL;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/StorageDone",
+					"$(PROJECT_DIR)/StorageDone/src",
+				);
 				INFOPLIST_FILE = StorageDone/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -364,6 +374,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = dariopellegrini.StorageDone;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -381,10 +392,16 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = SDK36A53QL;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/StorageDone",
+					"$(PROJECT_DIR)/StorageDone/src",
+				);
 				INFOPLIST_FILE = StorageDone/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -392,6 +409,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = dariopellegrini.StorageDone;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
