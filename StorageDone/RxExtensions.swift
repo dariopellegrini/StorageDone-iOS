@@ -272,6 +272,43 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             }
         }
     }
+    
+    // MARK: - Search
+    func search<T: Decodable>(_ text: String) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            do {
+                subscriber.onNext( try self.base.search(text) )
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func search<T: Decodable>(_ text: String, closure: @escaping (AdvancedQuery) -> ()) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            do {
+                subscriber.onNext( try self.base.search(text, using: closure) )
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func search<T: Decodable>(_ text: String, _ options: QueryOption...) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            do {
+                subscriber.onNext( try self.base.search(text: text, options: options) )
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
 }
 
 public struct RxWrapper<Base> {

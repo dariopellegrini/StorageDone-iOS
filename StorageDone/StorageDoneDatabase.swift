@@ -502,7 +502,7 @@ public struct StorageDoneDatabase {
         }), withName: "\(String(describing: T.self))-index")
     }
     
-    public func search<T: Decodable>(text: String) throws -> [T] {
+    public func search<T: Decodable>(_ text: String) throws -> [T] {
         let query = QueryBuilder
             .select(SelectResult.all())
             .from(DataSource.database(database))
