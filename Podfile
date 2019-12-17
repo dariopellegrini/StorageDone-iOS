@@ -5,7 +5,7 @@ target 'StorageDone' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  pod 'CouchbaseLite-Swift', '~> 2.6.1'
+  pod 'CouchbaseLite-Swift'
   pod 'RxSwift'
 
 end

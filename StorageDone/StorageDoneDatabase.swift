@@ -180,7 +180,7 @@ public struct StorageDoneDatabase {
             } else if let orderQuery = query as? OrderBy {
                 query = orderQuery.limit(Expression.int(limit), offset: Expression.int(skip))
             }
-        } else if let limit = advancedQuery.limit{
+        } else if let limit = advancedQuery.limit {
             if let whereQuery = query as? Where {
                 query = whereQuery.limit(Expression.int(limit))
             } else if let orderQuery = query as? OrderBy {
@@ -199,6 +199,46 @@ public struct StorageDoneDatabase {
             }
         }
         return list
+    }
+    
+    public func get<T: Decodable>(_ options: QueryOption...) throws -> [T] {
+        
+        var expressionsArray = [ExpressionProtocol]()
+        var orderingsArray = [OrderingProtocol]()
+        var limitValue: Int? = nil
+        var skipValue: Int? = nil
+        options.forEach {
+            switch $0 {
+            case .expression(let expression):
+                expressionsArray.append(expression)
+            case .orderings(let orderings):
+                orderingsArray.append(contentsOf: orderings)
+            case .ordering(let ordering):
+                orderingsArray.append(ordering)
+            case .limit(let limit):
+                limitValue = limit
+            case .skip(let skip):
+                skipValue = skip
+            }
+        }
+        
+        return try get {
+            if (expressionsArray.count > 0) {
+                $0.expression = and(expressions: expressionsArray)
+            }
+            
+            if (orderingsArray.count > 0) {
+                $0.orderings = orderingsArray
+            }
+            
+            if let limit = limitValue {
+                $0.limit = limit
+                
+                if let skip  = skipValue {
+                    $0.skip = skip
+                }
+            }
+        }
     }
     
     // MARK: - Delete
