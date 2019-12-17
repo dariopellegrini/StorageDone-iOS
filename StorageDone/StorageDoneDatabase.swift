@@ -201,8 +201,7 @@ public struct StorageDoneDatabase {
         return list
     }
     
-    public func get<T: Decodable>(_ options: QueryOption...) throws -> [T] {
-        
+    public func get<T: Decodable>(_ options: [QueryOption]) throws -> [T] {
         var expressionsArray = [ExpressionProtocol]()
         var orderingsArray = [OrderingProtocol]()
         var limitValue: Int? = nil
@@ -239,6 +238,10 @@ public struct StorageDoneDatabase {
                 }
             }
         }
+    }
+    
+    public func get<T: Decodable>(_ options: QueryOption...) throws -> [T] {
+        return try get(options)
     }
     
     // MARK: - Delete
@@ -449,6 +452,49 @@ public struct StorageDoneDatabase {
         return try live(T.self, using: using, closure: closure)
     }
     
+    public func live<T: Codable>(_ options: [QueryOption], closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        var expressionsArray = [ExpressionProtocol]()
+        var orderingsArray = [OrderingProtocol]()
+        var limitValue: Int? = nil
+        var skipValue: Int? = nil
+        options.forEach {
+            switch $0 {
+            case .expression(let expression):
+                expressionsArray.append(expression)
+            case .orderings(let orderings):
+                orderingsArray.append(contentsOf: orderings)
+            case .ordering(let ordering):
+                orderingsArray.append(ordering)
+            case .limit(let limit):
+                limitValue = limit
+            case .skip(let skip):
+                skipValue = skip
+            }
+        }
+        
+        return try live({
+            if (expressionsArray.count > 0) {
+                $0.expression = and(expressions: expressionsArray)
+            }
+            
+            if (orderingsArray.count > 0) {
+                $0.orderings = orderingsArray
+            }
+            
+            if let limit = limitValue {
+                $0.limit = limit
+                
+                if let skip  = skipValue {
+                    $0.skip = skip
+                }
+            }
+        }, closure: closure)
+    }
+    
+    public func live<T: Codable>(_ options: QueryOption..., closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        return try live(options, closure: closure)
+    }
+    
     // MARK: - Fulltext
     public func fulltextIndex<T>(_ type: T.Type, values: String...) throws {
         try database.createIndex(IndexBuilder.fullTextIndex(items: values.map {
@@ -478,7 +524,7 @@ public struct StorageDoneDatabase {
         return list
     }
     
-    public func search<T: Decodable>(text: String, using: (AdvancedQuery) -> ()) throws -> [T] {
+    public func search<T: Decodable>(_ text: String, using: (AdvancedQuery) -> ()) throws -> [T] {
         
         let advancedQuery = AdvancedQuery()
         using(advancedQuery)
@@ -532,6 +578,49 @@ public struct StorageDoneDatabase {
             }
         }
         return list
+    }
+    
+    public func search<T: Decodable>(text: String, options: [QueryOption]) throws -> [T] {
+        var expressionsArray = [ExpressionProtocol]()
+        var orderingsArray = [OrderingProtocol]()
+        var limitValue: Int? = nil
+        var skipValue: Int? = nil
+        options.forEach {
+            switch $0 {
+            case .expression(let expression):
+                expressionsArray.append(expression)
+            case .orderings(let orderings):
+                orderingsArray.append(contentsOf: orderings)
+            case .ordering(let ordering):
+                orderingsArray.append(ordering)
+            case .limit(let limit):
+                limitValue = limit
+            case .skip(let skip):
+                skipValue = skip
+            }
+        }
+        
+        return try search(text) {
+            if (expressionsArray.count > 0) {
+                $0.expression = and(expressions: expressionsArray)
+            }
+            
+            if (orderingsArray.count > 0) {
+                $0.orderings = orderingsArray
+            }
+            
+            if let limit = limitValue {
+                $0.limit = limit
+                
+                if let skip  = skipValue {
+                    $0.skip = skip
+                }
+            }
+        }
+    }
+    
+    public func search<T: Decodable>(_ text: String, _ options: QueryOption...) throws -> [T] {
+        return try search(text: text, options: options)
     }
 }
 

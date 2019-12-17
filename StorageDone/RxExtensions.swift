@@ -111,6 +111,18 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
+    func get<T: Decodable>(_ options: QueryOption...) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            do {
+                subscriber.onNext( try self.base.get(options) )
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+    
     // MARK: - Delete
     func delete<T>(type: T.Type, filter: [String:String]? = nil) -> Observable<Void> {
         return Observable.create {
@@ -242,6 +254,23 @@ public extension RxWrapper where Base == StorageDoneDatabase {
     
     func live<T: Codable>(_ using: @escaping (AdvancedQuery) -> ()) -> Observable<[T]> {
         return self.live(T.self, using: using)
+    }
+    
+    func live<T: Codable>(_ type: T.Type, _ options: QueryOption...) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            var liveQuery: LiveQuery? = nil
+            do {
+                liveQuery = try self.base.live(options) {
+                    subscriber.onNext($0)
+                }
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create {
+                liveQuery?.cancel()
+            }
+        }
     }
 }
 
