@@ -274,6 +274,17 @@ try database.live({
 }
 ```
 
+## Query options
+Another way to perform queries using DSL is through QueryOption enum.
+```swift
+let teachers: [Teacher] = try storage.get(
+    .expression("id".equal("id1")),
+    .expression(or("name".equal("Silvia"), "name".equal("Sara"))),
+    .ordering("name".ascending),
+    .ordering("dateCreated".descending)
+)
+```
+
 ## Fulltext search
 Fulltext search needs to be configured with the parameters' name that should be indexed.
 After that, a query can be performed with search text and with an optional advanced query.
