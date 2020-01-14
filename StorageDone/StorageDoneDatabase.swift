@@ -622,6 +622,18 @@ public struct StorageDoneDatabase {
     public func search<T: Decodable>(_ text: String, _ options: QueryOption...) throws -> [T] {
         return try search(text: text, options: options)
     }
+    
+    // MARK: - Files
+    public func save(data: Data, id: String) throws {
+        let mutableDocument = MutableDocument(id: id)
+        mutableDocument.setBlob(Blob(contentType: "application/binary", data: data), forKey: "data")
+        try database.saveDocument(mutableDocument)
+    }
+    
+    public func getData(id: String) -> Data? {
+        let document = database.document(withID: id)
+        return document?.blob(forKey: "data")?.content
+    }
 }
 
 extension Encodable {
