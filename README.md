@@ -281,7 +281,9 @@ let teachers: [Teacher] = try storage.get(
     .expression("id".equal("id1")),
     .expression(or("name".equal("Silvia"), "name".equal("Sara"))),
     .ordering("name".ascending),
-    .ordering("dateCreated".descending)
+    .ordering("dateCreated".descending),
+    .limit(2),
+    .skip(1)
 )
 ```
 
