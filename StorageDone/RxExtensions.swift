@@ -79,6 +79,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         return Observable.create {
             subscriber in
             do {
+                print("StorageDone \(Thread.isMainThread)")
                 subscriber.onNext( try self.base.get() )
             } catch let e {
                 subscriber.onError(e)
