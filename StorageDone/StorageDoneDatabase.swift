@@ -637,12 +637,40 @@ public struct StorageDoneDatabase {
 }
 
 extension Encodable {
-    func asDictionary() throws -> [String: Any] {
-        let data = try JSONEncoder().encode(self)
-        guard let dictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] else {
+    public func asDictionary() throws -> [String: Any] {
+        var dataElements = [String:Blob]()
+        Mirror(reflecting: self).children.filter { $0.value is Data }.forEach {
+            if let data = $0.value as? Data,
+               let label = $0.label {
+                dataElements[label] = Blob(contentType: "application/binary", data: data)
+            }
+        }
+        let encoder = JSONEncoder()
+        encoder.dataEncodingStrategy = .custom(customDataEncoder)
+        let data = try encoder.encode(self)
+        var dictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+        dataElements.forEach {
+            if dictionary?[$0.key] != nil {
+                dictionary?[$0.key] = $0.value
+            }
+        }
+        guard let resultDictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] else {
             throw NSError()
         }
-        return dictionary
+        return resultDictionary
     }
+    
+//    public func asDictionary() throws -> [String: Any] {
+//        let data = try JSONEncoder().encode(self)
+//        guard let dictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] else {
+//            throw NSError()
+//        }
+//        return dictionary
+//    }
+}
+
+func customDataEncoder(data: Data, encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode("")
 }
 
