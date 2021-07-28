@@ -27,6 +27,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             do {
                 try self.base.insert(element: element)
                 subscriber.onNext(element)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -40,6 +41,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             do {
                 try self.base.insert(elements: elements)
                 subscriber.onNext(elements)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -54,6 +56,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             do {
                 try self.base.insertOrUpdate(element: element)
                 subscriber.onNext(element)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -67,6 +70,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             do {
                 try self.base.insertOrUpdate(elements: elements)
                 subscriber.onNext(elements)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -81,6 +85,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             do {
                 print("StorageDone \(Thread.isMainThread)")
                 subscriber.onNext( try self.base.get() )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -93,6 +98,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 subscriber.onNext( try self.base.get(expression) )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -105,6 +111,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 subscriber.onNext( try self.base.get(using: closure) )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -117,6 +124,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 subscriber.onNext( try self.base.get(options) )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -129,6 +137,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 subscriber.onNext( try self.base.get(options) )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -146,6 +155,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
                 } else {
                     subscriber.onNext(try self.base.delete(type))
                 }
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -160,6 +170,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
                 try self.base.delete(T.self)
                 try self.base.insertOrUpdate(elements: elements)
                 subscriber.onNext(elements)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -174,6 +185,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
                 try self.base.delete(T.self)
                 try self.base.insert(elements: elements)
                 subscriber.onNext(elements)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -188,6 +200,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
                 try self.base.delete(T.self)
                 try self.base.insertOrUpdate(element: element)
                 subscriber.onNext(element)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -202,6 +215,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
                 try self.base.delete(T.self)
                 try self.base.insert(element: element)
                 subscriber.onNext(element)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -214,6 +228,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 try self.base.delete(elements: elements)
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -226,6 +241,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 subscriber.onNext( try self.base.delete(type, expression) )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -320,6 +336,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 subscriber.onNext( try self.base.search(text) )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -332,6 +349,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 subscriber.onNext( try self.base.search(text, using: closure) )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
@@ -344,6 +362,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
             subscriber in
             do {
                 subscriber.onNext( try self.base.search(text: text, options: options) )
+                subscriber.onCompleted()
             } catch let e {
                 subscriber.onError(e)
             }
