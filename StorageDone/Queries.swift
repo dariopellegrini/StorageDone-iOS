@@ -37,8 +37,12 @@ extension String {
     public func contains(_ element: Any) -> ExpressionProtocol {
         return self |< element
     }
-    public func like(_ element: Any) -> ExpressionProtocol {
-        return self **= element
+    public func like(_ element: String, caseInsensitive: Bool = false) -> ExpressionProtocol {
+        if caseInsensitive == true {
+            return Function.lower(Expression.property(self)).like((Expression.value(element.lowercased())))
+        } else {
+            return Expression.property(self).like((Expression.value(element)))
+        }
     }
     public func regex(_ element: Any) -> ExpressionProtocol {
         return self /== element
