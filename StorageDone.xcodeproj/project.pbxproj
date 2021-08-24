@@ -68,7 +68,6 @@
 				A602BB43C207458DA9C9B466 /* Pods-StorageDone.debug.xcconfig */,
 				EF4BDBBBF7982315ADA17231 /* Pods-StorageDone.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -375,7 +374,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.10.3;
+				MARKETING_VERSION = 0.10.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dariopellegrini.StorageDone;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -405,7 +404,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.10.3;
+				MARKETING_VERSION = 0.10.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dariopellegrini.StorageDone;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
