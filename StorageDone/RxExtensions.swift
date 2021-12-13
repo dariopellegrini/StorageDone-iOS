@@ -167,8 +167,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         return Observable.create {
             subscriber in
             do {
-                try self.base.delete(T.self)
-                try self.base.insertOrUpdate(elements: elements)
+                try self.base.deleteAllAndInsertOrUpdate(elements: elements)
                 subscriber.onNext(elements)
                 subscriber.onCompleted()
             } catch let e {
@@ -182,8 +181,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         return Observable.create {
             subscriber in
             do {
-                try self.base.delete(T.self)
-                try self.base.insert(elements: elements)
+                try self.base.deleteAllAndInsert(elements: elements)
                 subscriber.onNext(elements)
                 subscriber.onCompleted()
             } catch let e {
@@ -197,8 +195,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         return Observable.create {
             subscriber in
             do {
-                try self.base.delete(T.self)
-                try self.base.insertOrUpdate(element: element)
+                try self.base.deleteAllAndInsertOrUpdate(element: element)
                 subscriber.onNext(element)
                 subscriber.onCompleted()
             } catch let e {
@@ -212,8 +209,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         return Observable.create {
             subscriber in
             do {
-                try self.base.delete(T.self)
-                try self.base.insert(element: element)
+                try self.base.deleteAllAndInsert(element: element)
                 subscriber.onNext(element)
                 subscriber.onCompleted()
             } catch let e {

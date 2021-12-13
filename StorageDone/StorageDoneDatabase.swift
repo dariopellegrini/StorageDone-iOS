@@ -84,6 +84,42 @@ public struct StorageDoneDatabase {
         }
     }
     
+    public func deleteAllAndInsert<T: Encodable>(elements: [T]) throws {
+        try database.inBatch {
+            try delete(T.self)
+            // Insert
+            try elements.forEach {
+                try insert(element: $0)
+            }
+        }
+    }
+    
+    public func deleteAllAndInsertOrUpdate<T: Encodable>(elements: [T]) throws {
+        try database.inBatch {
+            try delete(T.self)
+            // Insert
+            try elements.forEach {
+                try insertOrUpdate(element: $0)
+            }
+        }
+    }
+    
+    public func deleteAllAndInsert<T: Encodable>(element: T) throws {
+        try database.inBatch {
+            try delete(T.self)
+            // Insert
+            try insert(element: element)
+        }
+    }
+    
+    public func deleteAllAndInsertOrUpdate<T: Encodable>(element: T) throws {
+        try database.inBatch {
+            try delete(T.self)
+            // Insert
+            try insertOrUpdate(element: element)
+        }
+    }
+    
     // MARK: - Get
     public func get<T: Decodable>() throws -> [T] {
         let query = QueryBuilder

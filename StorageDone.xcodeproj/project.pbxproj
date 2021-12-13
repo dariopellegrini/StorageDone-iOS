@@ -163,6 +163,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = A39F33F8229850ED0086608B;
 			productRefGroup = A39F3403229850ED0086608B /* Products */;
@@ -374,7 +375,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.10.5;
+				MARKETING_VERSION = 0.10.6;
 				PRODUCT_BUNDLE_IDENTIFIER = dariopellegrini.StorageDone;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -404,7 +405,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.10.5;
+				MARKETING_VERSION = 0.10.6;
 				PRODUCT_BUNDLE_IDENTIFIER = dariopellegrini.StorageDone;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
