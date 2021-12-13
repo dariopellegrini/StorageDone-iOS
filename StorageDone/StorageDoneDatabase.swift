@@ -64,7 +64,7 @@ public struct StorageDoneDatabase {
             }
         }
     }
-
+    
     // MARK: - Insert
     public func insert<T: Encodable>(element: T) throws {
         let dictionary = try element.asDictionary()
@@ -84,40 +84,13 @@ public struct StorageDoneDatabase {
         }
     }
     
-    public func deleteAllAndInsert<T: Encodable>(elements: [T]) throws {
-        try database.inBatch {
-            try delete(T.self)
-            // Insert
-            try elements.forEach {
-                try insert(element: $0)
-            }
-        }
+    // MARK: - Upsert
+    public func upsert<T: Encodable>(element: T) throws {
+        try insertOrUpdate(element: element)
     }
     
-    public func deleteAllAndInsertOrUpdate<T: Encodable>(elements: [T]) throws {
-        try database.inBatch {
-            try delete(T.self)
-            // Insert
-            try elements.forEach {
-                try insertOrUpdate(element: $0)
-            }
-        }
-    }
-    
-    public func deleteAllAndInsert<T: Encodable>(element: T) throws {
-        try database.inBatch {
-            try delete(T.self)
-            // Insert
-            try insert(element: element)
-        }
-    }
-    
-    public func deleteAllAndInsertOrUpdate<T: Encodable>(element: T) throws {
-        try database.inBatch {
-            try delete(T.self)
-            // Insert
-            try insertOrUpdate(element: element)
-        }
+    public func upsert<T: Encodable>(elements: [T]) throws {
+        try insertOrUpdate(elements: elements)
     }
     
     // MARK: - Get
@@ -359,6 +332,44 @@ public struct StorageDoneDatabase {
     public func delete<T: PrimaryKey>(elements: [T]) throws {
         try elements.forEach {
             try delete(element: $0)
+        }
+    }
+    
+    // MARK: - Delete and Insert
+    
+    public func deleteAllAndInsert<T: Encodable>(elements: [T]) throws {
+        try database.inBatch {
+            try delete(T.self)
+            // Insert
+            try elements.forEach {
+                try insert(element: $0)
+            }
+        }
+    }
+    
+    public func deleteAllAndUpsert<T: Encodable>(elements: [T]) throws {
+        try database.inBatch {
+            try delete(T.self)
+            // Insert
+            try elements.forEach {
+                try insertOrUpdate(element: $0)
+            }
+        }
+    }
+    
+    public func deleteAllAndInsert<T: Encodable>(element: T) throws {
+        try database.inBatch {
+            try delete(T.self)
+            // Insert
+            try insert(element: element)
+        }
+    }
+    
+    public func deleteAllAndUpsert<T: Encodable>(element: T) throws {
+        try database.inBatch {
+            try delete(T.self)
+            // Insert
+            try insertOrUpdate(element: element)
         }
     }
     
