@@ -321,4 +321,11 @@ StorageDone-iOS is available under the MIT license. See the LICENSE file for mor
 
 <br>
 
+<a href="https://www.paypal.com/donate/?business=R8TE7AE9D5MRC&no_recurring=0&currency_code=EUR">
+  <img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" alt="Donate with PayPal" width=200px />
+</a>
+
+
+<!---
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/dpellegrini)
+-->
