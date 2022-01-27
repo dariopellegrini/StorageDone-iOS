@@ -318,3 +318,7 @@ Dario Pellegrini, pellegrini.dario.1303@gmail.com
 ## License
 
 StorageDone-iOS is available under the MIT license. See the LICENSE file for more info.
+
+<br>
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/dpellegrini)
