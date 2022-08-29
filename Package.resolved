@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CouchbaseLiteSwift",
+        "repositoryURL": "https://github.com/couchbase/couchbase-lite-ios.git",
+        "state": {
+          "branch": null,
+          "revision": "1067d291da5829089b4b5f38515456c4054f5576",
+          "version": "3.0.2"
+        }
+      },
+      {
+        "package": "RxSwift",
+        "repositoryURL": "https://github.com/ReactiveX/RxSwift.git",
+        "state": {
+          "branch": null,
+          "revision": "b4307ba0b6425c0ba4178e138799946c3da594f8",
+          "version": "6.5.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

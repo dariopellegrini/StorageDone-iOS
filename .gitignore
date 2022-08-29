@@ -25,3 +25,5 @@ xcuserdata
 *.ipa
 
 Pods/
+
+.build/
