@@ -555,7 +555,7 @@ public struct StorageDoneDatabase {
             .from(DataSource.database(database))
             .where(
                 Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                .and(FullTextExpression.index("\(String(describing: T.self))-index").match("'\(text)'"))
+                .and(FullTextFunction.match(indexName: "\(String(describing: T.self))-index", query: "'\(text)'"))
         )
         
         var list = [T]()
@@ -584,12 +584,12 @@ public struct StorageDoneDatabase {
         if let from = query as? From {
             if let expression = advancedQuery.expression {
                 query = from.where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                    .and(FullTextExpression.index("\(String(describing: T.self))-index").match("'\(text)'"))
+                    .and(FullTextFunction.match(indexName: "\(String(describing: T.self))-index", query: "'\(text)'"))
                     .and(expression))
             } else {
                 query = from.where(Expression.property(type)
                     .equalTo(Expression.string(String(describing: T.self)))
-                    .and(FullTextExpression.index("\(String(describing: T.self))-index").match("'\(text)'"))
+                    .and(FullTextFunction.match(indexName: "\(String(describing: T.self))-index", query: "'\(text)'"))
                 )
             }
         }

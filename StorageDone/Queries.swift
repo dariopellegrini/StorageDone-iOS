@@ -204,13 +204,13 @@ public func /==(key: String, element: Any) -> ExpressionProtocol {
 // Is nil
 prefix operator *?
 public prefix func *?(key: String) -> ExpressionProtocol {
-    return Expression.property(key).isNullOrMissing()
+    return Expression.property(key).isNotValued()
 }
 
 // Is not nil
 prefix operator *!
 public prefix func *!(key: String) -> ExpressionProtocol {
-    return Expression.property(key).notNullOrMissing()
+    return Expression.property(key).isValued()
 }
 
 public func and(_ expressions: ExpressionProtocol...) -> ExpressionProtocol {
