@@ -681,6 +681,12 @@ public struct StorageDoneDatabase {
         let document = database.document(withID: id)
         return document?.blob(forKey: "data")?.content
     }
+    
+    public func deleteData(id: String) throws {
+        if let document = database.document(withID: id) {
+            try database.deleteDocument(document)
+        }
+    }
 }
 
 extension Encodable {
