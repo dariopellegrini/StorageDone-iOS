@@ -83,7 +83,7 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
             try self.base.delete(type)
         }
     }
-    
+
     // MARK: - Files
     func save(data: Data, id: String) async throws {
         try await with(queue: queue) {

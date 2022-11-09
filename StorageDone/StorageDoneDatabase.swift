@@ -262,9 +262,8 @@ public struct StorageDoneDatabase {
             .where(Expression.property(type)
                 .equalTo(Expression.string(String(describing: T.self))))
         for result in try query.execute() {
-            if let id = result.string(forKey: "id"),
-                let doc = database.document(withID: id) {
-                try database.deleteDocument(doc)
+            if let id = result.string(forKey: "id") {
+                try database.purgeDocument(withID: id)
             }
         }
     }
@@ -277,10 +276,13 @@ public struct StorageDoneDatabase {
             .from(DataSource.database(database))
             .where(whereExpression)
         for result in try query.execute() {
-            if let id = result.string(forKey: "id"),
-                let doc = database.document(withID: id) {
-                try database.deleteDocument(doc)
+            if let id = result.string(forKey: "id") {
+                try database.purgeDocument(withID: id)
             }
+//            if let id = result.string(forKey: "id"),
+//                let doc = database.document(withID: id) {
+//                try database.deleteDocument(doc)
+//            }
         }
     }
     
@@ -296,10 +298,13 @@ public struct StorageDoneDatabase {
             .where(whereExpression)
         
         for result in try query.execute() {
-            if let id = result.string(forKey: "id"),
-                let doc = database.document(withID: id) {
-                try database.deleteDocument(doc)
+            if let id = result.string(forKey: "id") {
+                try database.purgeDocument(withID: id)
             }
+//            if let id = result.string(forKey: "id"),
+//                let doc = database.document(withID: id) {
+//                try database.deleteDocument(doc)
+//            }
         }
     }
     
@@ -311,10 +316,13 @@ public struct StorageDoneDatabase {
                 .and(expression))
         
         for result in try query.execute() {
-            if let id = result.string(forKey: "id"),
-                let doc = database.document(withID: id) {
-                try database.deleteDocument(doc)
+            if let id = result.string(forKey: "id") {
+                try database.purgeDocument(withID: id)
             }
+//            if let id = result.string(forKey: "id"),
+//                let doc = database.document(withID: id) {
+//                try database.deleteDocument(doc)
+//            }
         }
     }
     
@@ -324,7 +332,8 @@ public struct StorageDoneDatabase {
             }.first?.value),
             let document = database.document(withID: "\(primaryKeyValue)-\(String(describing: T.self))") {
             if String(describing: T.self) == document.string(forKey: type) {
-                try database.deleteDocument(document)
+                try database.purgeDocument(document)
+//                try database.deleteDocument(document)
             }
         }
     }
@@ -684,7 +693,8 @@ public struct StorageDoneDatabase {
     
     public func deleteData(id: String) throws {
         if let document = database.document(withID: id) {
-            try database.deleteDocument(document)
+            try database.purgeDocument(document)
+//            try database.deleteDocument(document)
         }
     }
 }
