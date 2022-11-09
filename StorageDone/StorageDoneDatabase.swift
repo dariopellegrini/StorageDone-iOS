@@ -255,38 +255,56 @@ public struct StorageDoneDatabase {
     
     // MARK: - Delete
     
-    public func delete<T>(_ elementType: T.Type) throws{
+    public func delete<T>(_ elementType: T.Type, batch: Bool = true) throws{
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
             .from(DataSource.database(database))
             .where(Expression.property(type)
                 .equalTo(Expression.string(String(describing: T.self))))
-        for result in try query.execute() {
-            if let id = result.string(forKey: "id") {
-                try database.purgeDocument(withID: id)
+        
+        if batch == true {
+            try database.inBatch {
+                for result in try query.execute() {
+                    if let id = result.string(forKey: "id") {
+                        try database.purgeDocument(withID: id)
+                    }
+                }
+            }
+        } else {
+            for result in try query.execute() {
+                if let id = result.string(forKey: "id") {
+                    try database.purgeDocument(withID: id)
+                }
             }
         }
     }
     
-    public func delete<T>(_ elementType: T.Type, filter: [String:Any]) throws {
+    public func delete<T>(_ elementType: T.Type, filter: [String:Any], batch: Bool = true) throws {
         let whereExpression = filter.whereExpression(startingExpression: Expression.property(type).equalTo(Expression.string(String(describing: T.self))))
         
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
             .from(DataSource.database(database))
             .where(whereExpression)
-        for result in try query.execute() {
-            if let id = result.string(forKey: "id") {
-                try database.purgeDocument(withID: id)
+        
+        if batch == true {
+            try database.inBatch {
+                for result in try query.execute() {
+                    if let id = result.string(forKey: "id") {
+                        try database.purgeDocument(withID: id)
+                    }
+                }
             }
-//            if let id = result.string(forKey: "id"),
-//                let doc = database.document(withID: id) {
-//                try database.deleteDocument(doc)
-//            }
+        } else {
+            for result in try query.execute() {
+                if let id = result.string(forKey: "id") {
+                    try database.purgeDocument(withID: id)
+                }
+            }
         }
     }
     
-    public func delete<T>(_ elementType: T.Type, whereExpressions: [ExpressionProtocol]) throws {
+    public func delete<T>(_ elementType: T.Type, whereExpressions: [ExpressionProtocol], batch: Bool = true) throws {
         var whereExpression = Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
         whereExpressions.forEach {
             whereExpression = whereExpression.and($0)
@@ -297,32 +315,44 @@ public struct StorageDoneDatabase {
             .from(DataSource.database(database))
             .where(whereExpression)
         
-        for result in try query.execute() {
-            if let id = result.string(forKey: "id") {
-                try database.purgeDocument(withID: id)
+        if batch == true {
+            try database.inBatch {
+                for result in try query.execute() {
+                    if let id = result.string(forKey: "id") {
+                        try database.purgeDocument(withID: id)
+                    }
+                }
             }
-//            if let id = result.string(forKey: "id"),
-//                let doc = database.document(withID: id) {
-//                try database.deleteDocument(doc)
-//            }
+        } else {
+            for result in try query.execute() {
+                if let id = result.string(forKey: "id") {
+                    try database.purgeDocument(withID: id)
+                }
+            }
         }
     }
     
-    public func delete<T>(_ elementType: T.Type, _ expression: ExpressionProtocol) throws {
+    public func delete<T>(_ elementType: T.Type, _ expression: ExpressionProtocol, batch: Bool = true) throws {
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
             .from(DataSource.database(database))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
         
-        for result in try query.execute() {
-            if let id = result.string(forKey: "id") {
-                try database.purgeDocument(withID: id)
+        if batch == true {
+            try database.inBatch {
+                for result in try query.execute() {
+                    if let id = result.string(forKey: "id") {
+                        try database.purgeDocument(withID: id)
+                    }
+                }
             }
-//            if let id = result.string(forKey: "id"),
-//                let doc = database.document(withID: id) {
-//                try database.deleteDocument(doc)
-//            }
+        } else {
+            for result in try query.execute() {
+                if let id = result.string(forKey: "id") {
+                    try database.purgeDocument(withID: id)
+                }
+            }
         }
     }
     
@@ -333,14 +363,15 @@ public struct StorageDoneDatabase {
             let document = database.document(withID: "\(primaryKeyValue)-\(String(describing: T.self))") {
             if String(describing: T.self) == document.string(forKey: type) {
                 try database.purgeDocument(document)
-//                try database.deleteDocument(document)
             }
         }
     }
     
     public func delete<T: PrimaryKey>(elements: [T]) throws {
-        try elements.forEach {
-            try delete(element: $0)
+        try database.inBatch {
+            try elements.forEach {
+                try delete(element: $0)
+            }
         }
     }
     
@@ -348,7 +379,7 @@ public struct StorageDoneDatabase {
     
     public func deleteAllAndInsert<T: Encodable>(elements: [T]) throws {
         try database.inBatch {
-            try delete(T.self)
+            try delete(T.self, batch: false)
             // Insert
             try elements.forEach {
                 try insert(element: $0)
@@ -358,7 +389,7 @@ public struct StorageDoneDatabase {
     
     public func deleteAllAndUpsert<T: Encodable>(elements: [T]) throws {
         try database.inBatch {
-            try delete(T.self)
+            try delete(T.self, batch: false)
             // Insert
             try elements.forEach {
                 try insertOrUpdate(element: $0)
@@ -368,7 +399,7 @@ public struct StorageDoneDatabase {
     
     public func deleteAllAndInsert<T: Encodable>(element: T) throws {
         try database.inBatch {
-            try delete(T.self)
+            try delete(T.self, batch: false)
             // Insert
             try insert(element: element)
         }
@@ -376,9 +407,28 @@ public struct StorageDoneDatabase {
     
     public func deleteAllAndUpsert<T: Encodable>(element: T) throws {
         try database.inBatch {
-            try delete(T.self)
+            try delete(T.self, batch: false)
             // Insert
             try insertOrUpdate(element: element)
+        }
+    }
+    
+    public func purgeDeletedDocuments() throws {
+        let query = QueryBuilder
+            .select(SelectResult.expression(Meta.id))
+            .from(DataSource.database(database))
+            .where(Meta.isDeleted)
+        
+        do {
+            try database.inBatch {
+                for result in try query.execute() {
+                    if let id = result.string(forKey: "id") {
+                        try database.purgeDocument(withID: id)
+                    }
+                }
+            }
+        } catch {
+            print(error)
         }
     }
     
