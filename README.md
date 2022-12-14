@@ -188,10 +188,6 @@ let liveQuery = try storage.live("id".equal("id1")) {
 In order to stop observing just call cancel on LiveQuery object.
 ```swift
 liveQuery.cancel()
-
-// or
-
-disposable.disposed(by: disposeBag)
 ```
 
 ## Advanced queries
@@ -302,6 +298,10 @@ let disposable = database.rx.live("id".equal("id1")).subscribe(onNext: {
 To stop observing changes just dispose the disposable or alternatively add it to a dispose bag.
 ```swift
 disposable.dispose()
+
+// or
+
+disposable.disposed(by: disposeBag)
 ```
 
 ## Async await
