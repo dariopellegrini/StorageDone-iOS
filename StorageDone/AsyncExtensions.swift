@@ -9,12 +9,12 @@ import Foundation
 
 @available(iOS 15, *)
 public extension StorageDoneDatabase {
-    func async(_ queue: DispatchQueue) -> AsyncQueueWrapper<StorageDoneDatabase> {
-        AsyncQueueWrapper(self, queue: queue)
+    func async(_ priority: TaskPriority) -> AsyncQueueWrapper<StorageDoneDatabase> {
+        AsyncQueueWrapper(self, priority: priority)
     }
     
     var async: AsyncQueueWrapper<StorageDoneDatabase> {
-        get { return AsyncQueueWrapper(self, queue: DispatchQueue.global(qos: .utility)) }
+        get { return AsyncQueueWrapper(self, priority: .medium) }
         set { }
     }
 }
@@ -22,10 +22,10 @@ public extension StorageDoneDatabase {
 @available(iOS 15, *)
 public struct AsyncQueueWrapper<Base> {
     public let base: Base
-    public let queue: DispatchQueue
-    public init(_ base: Base, queue: DispatchQueue) {
+    public let priority: TaskPriority
+    public init(_ base: Base, priority: TaskPriority) {
         self.base = base
-        self.queue = queue
+        self.priority = priority
     }
 }
 
@@ -34,67 +34,135 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
     
     // MARK: - Insert
     func insert<T: Encodable>(element: T) async throws {
-        try await with(queue: queue) {
+        try await Task(priority: priority) {
             try self.base.insert(element: element)
-        }
+        }.value
     }
     
     func insert<T: Encodable>(elements: [T]) async throws {
-        try await with(queue: queue) {
+        try await Task(priority: priority) {
             try self.base.insert(elements: elements)
-        }
+        }.value
     }
     
     // MARK: - Insert or update
     func insertOrUpdate<T: Encodable>(element: T) async throws {
-        try await with(queue: queue) {
+        try await Task(priority: priority) {
             try self.base.insertOrUpdate(element: element)
-        }
+        }.value
     }
     
     func insertOrUpdate<T: Encodable>(elements: [T]) async throws {
-        try await with(queue: queue) {
+        try await Task(priority: priority) {
             try self.base.insertOrUpdate(elements: elements)
-        }
+        }.value
     }
     
     // MARK: - Get
     func get<T: Codable>() async throws -> [T] {
-        try await with(queue: queue) {
+        try await Task(priority: priority) {
             try self.base.get()
-        }
+        }.value
     }
     
     func get<T: Codable>(_ advancedQuery: @escaping (AdvancedQuery) -> ()) async throws -> [T] {
-        try await with(queue: queue) {
+        try await Task(priority: priority) {
             try self.base.get(using: advancedQuery)
-        }
+        }.value
     }
     
     func get<T: Codable>(_ queryOptions: QueryOption...) async throws -> [T] {
-        try await with(queue: queue) {
+        try await Task(priority: priority) {
             try self.base.get(queryOptions)
-        }
+        }.value
+    }
+    
+    func get<T: Codable>(_ queryOptions: [QueryOption]) async throws -> [T] {
+        try await Task(priority: priority) {
+            try self.base.get(queryOptions)
+        }.value
     }
     
     // MARK: - Delete
     func delete<T: Codable>(_ type: T.Type) async throws {
-        try await with(queue: queue) {
+        try await Task(priority: priority) {
             try self.base.delete(type)
-        }
+        }.value
     }
-
-    // MARK: - Files
-    func save(data: Data, id: String) async throws {
-        try await with(queue: queue) {
-            try self.base.save(data: data, id: id)
+    
+    func deleteAllAndInsert<T: Codable>(element: T) async throws {
+        try await Task(priority: priority) {
+            try self.base.deleteAllAndInsert(element: element)
+        }.value
+    }
+    
+    func deleteAllAndInsert<T: Codable>(elements: [T]) async throws {
+        try await Task(priority: priority) {
+            try self.base.deleteAllAndInsert(elements: elements)
+        }.value
+    }
+    
+    // MARK: - Live
+    func live<T: Codable>() -> AsyncThrowingStream<[T], Error> {
+        AsyncThrowingStream { continuation in
+            do {
+                let liveQuery = try self.base.live {
+                    continuation.yield($0)
+                }
+                continuation.onTermination = { @Sendable status in
+                    liveQuery.cancel()
+                }
+            } catch let e {
+                continuation.finish(throwing: e)
+            }
         }
     }
     
-    func getData(id: String) async throws -> Data? {
-        try await with(queue: queue) {
-            self.base.getData(id: id)
+    func live<T: Codable>(_ queryOptions: [QueryOption]) -> AsyncThrowingStream<[T], Error> {
+        AsyncThrowingStream { continuation in
+            do {
+                let liveQuery = try self.base.live(queryOptions) {
+                    continuation.yield($0)
+                }
+                continuation.onTermination = { @Sendable status in
+                    liveQuery.cancel()
+                }
+            } catch let e {
+                continuation.finish(throwing: e)
+            }
         }
+    }
+    
+    func live<T: Codable>(_ queryOptions: QueryOption...) -> AsyncThrowingStream<[T], Error> {
+        live(queryOptions)
+    }
+    
+    func live<T: Codable>(_ advancedQuery: @escaping (AdvancedQuery) -> ()) -> AsyncThrowingStream<[T], Error> {
+        AsyncThrowingStream { continuation in
+            do {
+                let liveQuery = try self.base.live(advancedQuery) {
+                    continuation.yield($0)
+                }
+                continuation.onTermination = { @Sendable status in
+                    liveQuery.cancel()
+                }
+            } catch let e {
+                continuation.finish(throwing: e)
+            }
+        }
+    }
+    
+    // MARK: - Files
+    func save(data: Data, id: String) async throws {
+        try await Task(priority: priority) {
+            try self.base.save(data: data, id: id)
+        }.value
+    }
+    
+    func getData(id: String) async throws -> Data? {
+        await Task(priority: priority) {
+            self.base.getData(id: id)
+        }.value
     }
 }
 

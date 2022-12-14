@@ -359,7 +359,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         return self.live(T.self, using: using)
     }
     
-    func live<T: Codable>(_ type: T.Type, _ options: QueryOption...) -> Observable<[T]> {
+    func live<T: Codable>(_ options: [QueryOption]) -> Observable<[T]> {
         return Observable.create {
             subscriber in
             var liveQuery: LiveQuery? = nil
@@ -374,6 +374,10 @@ public extension RxWrapper where Base == StorageDoneDatabase {
                 liveQuery?.cancel()
             }
         }
+    }
+    
+    func live<T: Codable>(_ options: QueryOption...) -> Observable<[T]> {
+        live(options)
     }
     
     // MARK: - Search

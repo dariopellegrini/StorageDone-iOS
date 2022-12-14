@@ -12,7 +12,7 @@
 		6740B9E422C0FB3B00FDDDA0 /* Queries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6740B9E322C0FB3B00FDDDA0 /* Queries.swift */; };
 		675C6A8223A916EB004B681E /* QueryOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675C6A8123A916EB004B681E /* QueryOption.swift */; };
 		6762AD9C22AFFAE800830AC8 /* DictionaryExtenions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6762AD9B22AFFAE800830AC8 /* DictionaryExtenions.swift */; };
-		67A2CBAA28BD42EC00382BB3 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A2CBA928BD42EC00382BB3 /* Package.swift */; };
+		6789EF27294936A300FFAF6D /* AsyncExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6789EF26294936A300FFAF6D /* AsyncExtensions.swift */; };
 		67A5FB0E2316C7040099A681 /* AdvancedQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A5FB0D2316C7040099A681 /* AdvancedQuery.swift */; };
 		67D0331922D3851400BD3A58 /* LiveQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D0331822D3851400BD3A58 /* LiveQuery.swift */; };
 		84BA442C7F632D1AD92A772D /* Pods_StorageDone.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE8F8E19B5D5FB4FCB4431EC /* Pods_StorageDone.framework */; };
@@ -29,6 +29,7 @@
 		6740B9E322C0FB3B00FDDDA0 /* Queries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queries.swift; sourceTree = "<group>"; };
 		675C6A8123A916EB004B681E /* QueryOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryOption.swift; sourceTree = "<group>"; };
 		6762AD9B22AFFAE800830AC8 /* DictionaryExtenions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryExtenions.swift; sourceTree = "<group>"; };
+		6789EF26294936A300FFAF6D /* AsyncExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncExtensions.swift; sourceTree = "<group>"; };
 		67A2CBA928BD42EC00382BB3 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		67A5FB0D2316C7040099A681 /* AdvancedQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedQuery.swift; sourceTree = "<group>"; };
 		67D0331822D3851400BD3A58 /* LiveQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveQuery.swift; sourceTree = "<group>"; };
@@ -98,6 +99,7 @@
 			children = (
 				A39F341A229860140086608B /* Operators.swift */,
 				A39F3418229860140086608B /* PrimaryKey.swift */,
+				6789EF26294936A300FFAF6D /* AsyncExtensions.swift */,
 				A39F3419229860140086608B /* RxExtensions.swift */,
 				A39F3405229850ED0086608B /* StorageDone.h */,
 				A39F3406229850ED0086608B /* Info.plist */,
@@ -228,7 +230,7 @@
 				670D525A2311C8F000FA0DB7 /* StringExtensions.swift in Sources */,
 				A39F341F229860150086608B /* Operators.swift in Sources */,
 				A39F341C229860150086608B /* RxExtensions.swift in Sources */,
-				67A2CBAA28BD42EC00382BB3 /* Package.swift in Sources */,
+				6789EF27294936A300FFAF6D /* AsyncExtensions.swift in Sources */,
 				A39F341E229860150086608B /* PrimaryKey.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
