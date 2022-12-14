@@ -345,6 +345,29 @@ To stop observing changes just cancel the task.
 task.cancel()
 ```
 
+## StorageDoneVariable (beta)
+StorageDone brings `StorageDoneVariable`, a struct that tries to emulate `BehaviorSubject` features, using the local database as a data container.
+First create a `StorageDoneVariable`.
+```swift
+let variable: StorageDoneVariable<Teacher> = database.variable()
+```
+
+This object is an abstraction layer that allows one to perform read, write and observe operations on the database.
+
+### Read and write
+Read and write can be performed synchronously or asynchronously.
+```swift
+// Synchronously
+let teachers = variable.elements
+variable.accept(elements: teachers)
+
+// Asynchronously
+let teachers = await variable.asyncElements
+variable.acceptAsync(elements: teachers)
+```
+By default `accept` performs an `insertOrUpdate` operation, replacing the already existing elements and adding the new ones.
+Adding the parameter `delete` to accept functions makes `variable` perform a `deleteAllAndInsert` operation, replacing all the elements of the collection with new ones.
+
 ## Author
 
 Dario Pellegrini, pellegrini.dario.1303@gmail.com
