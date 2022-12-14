@@ -307,23 +307,42 @@ disposable.disposed(by: disposeBag)
 ## Async await
 Every operation has its async await version. By default they are on a `.medium` priority task.
 ```swift
+let teachers: [Teacher] = try await database.async.insertOrUpdate(teachers)
 
-database.async.insertOrUpdate(teachers)
+let teachers: [Teacher] = try await database.async.insert(teachers)
 
-database.async.insert(teachers)
+let teachers: [Teacher] = try await database.async.get()
 
-database.async.get()
-
-database.async.get {
+let teachers: [Teacher] = try await database.async.get {
     $0.expression = "id".equal(id)
 }
 
-database.async.get(.expression("id".equal("id1")))
+let teachers: [Teacher] = try await database.async.get(.expression("id".equal("id1")))
 
-database.async.delete(["id":"id2"])
+let teachers: [Teacher] = try await database.async.delete(["id":"id2"])
 
-database.async.deleteAllAndInsert(teachers)
+let teachers: [Teacher] = try await database.async.deleteAllAndInsert(teachers)
 
+```
+
+To run every task with a different priority simply specify it in the `async` extension.
+```swift
+let teachers: [Teacher] = try await database.async(.userInitiated).get()
+```
+
+### Async streams
+Live queries can be represented using swift async streams.
+```swift
+task = Task {
+    for try await teachers: [Teacher] in database.async.live() {
+        print("Count \(teachers.count)")
+    }
+}
+```
+
+To stop observing changes just cancel the task.
+```swift
+task.cancel()
 ```
 
 ## Author
