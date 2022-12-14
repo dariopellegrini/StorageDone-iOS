@@ -188,7 +188,6 @@ let liveQuery = try storage.live("id".equal("id1")) {
 In order to stop observing just call cancel on LiveQuery object.
 ```swift
 liveQuery.cancel()
-```
 
 // or
 
@@ -303,6 +302,28 @@ let disposable = database.rx.live("id".equal("id1")).subscribe(onNext: {
 To stop observing changes just dispose the disposable or alternatively add it to a dispose bag.
 ```swift
 disposable.dispose()
+```
+
+## Async await
+Every operation has its async await version. By default they are on a `.medium` priority task.
+```swift
+
+database.async.insertOrUpdate(teachers)
+
+database.async.insert(teachers)
+
+database.async.get()
+
+database.async.get {
+    $0.expression = "id".equal(id)
+}
+
+database.async.get(.expression("id".equal("id1")))
+
+database.async.delete(["id":"id2"])
+
+database.async.deleteAllAndInsert(teachers)
+
 ```
 
 ## Author
