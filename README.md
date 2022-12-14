@@ -66,24 +66,6 @@ let teachers = [Teacher(id: "id1", name: "Sarah", surname: "Jones", age: 29, cv:
 try? database.insertOrUpdate(elements: teachers)
 ```
 
-### RxSwift
-Every operation has its RxSwift version. Each can be used through rx extension
-```swift
-
-database.rx.insertOrUpdate(teachers)
-
-database.rx.insert(teachers)
-
-database.rx.get()
-
-database.rx.get(["id":"id1"])
-
-database.rx.delete(["id":"id2"])
-
-database.rx.deleteAllAndInsert(teachers)
-
-```
-
 ### Operators
 Database objects can use different custom operators, which wrap try-catch logic and give a more compact way to access database
 ```swift
@@ -208,37 +190,6 @@ In order to stop observing just call cancel on LiveQuery object.
 liveQuery.cancel()
 ```
 
-### RxSwift live queries
-
-Live queries are also available through RxSwift extensions.
-```swift
-// All elements
-let disposable = database.rx.live(Teacher.self).subscribe(onNext: {
-    teachers in
-    print("Count \(teachers.count)")
-})
-
-let disposable = database.rx.live().subscribe(onNext: {
-    (teachers: [Teacher]) in
-    print("Count \(teachers.count)")
-})
-
-// Elements with query
-let disposable = database.rx.live(Teacher.self, expression: "id".equal("id1")).subscribe(onNext: {
-    teachers in
-    print("Count \(teachers.count)")
-})
-
-let disposable = database.rx.live("id".equal("id1")).subscribe(onNext: {
-    (teachers: [Teacher]) in
-    print("Count \(teachers.count)")
-})
-```
-
-To stop observing changes just dispose the disposable or alternatively add it to a dispose bag.
-```swift
-disposable.dispose()
-
 // or
 
 disposable.disposed(by: disposeBag)
@@ -302,7 +253,56 @@ let teachers: [Teacher] = try self.database.search(text: text)
 let teachers: [Teacher] = try self.database.search(text: text) {
     $0.orderings = ["age".descending]
 }
+```
 
+## RxSwift
+Every operation has its RxSwift version. Each can be used through rx extension
+```swift
+
+database.rx.insertOrUpdate(teachers)
+
+database.rx.insert(teachers)
+
+database.rx.get()
+
+database.rx.get(["id":"id1"])
+
+database.rx.delete(["id":"id2"])
+
+database.rx.deleteAllAndInsert(teachers)
+
+```
+
+### RxSwift live queries
+
+Live queries are also available through RxSwift extensions.
+```swift
+// All elements
+let disposable = database.rx.live(Teacher.self).subscribe(onNext: {
+    teachers in
+    print("Count \(teachers.count)")
+})
+
+let disposable = database.rx.live().subscribe(onNext: {
+    (teachers: [Teacher]) in
+    print("Count \(teachers.count)")
+})
+
+// Elements with query
+let disposable = database.rx.live(Teacher.self, expression: "id".equal("id1")).subscribe(onNext: {
+    teachers in
+    print("Count \(teachers.count)")
+})
+
+let disposable = database.rx.live("id".equal("id1")).subscribe(onNext: {
+    (teachers: [Teacher]) in
+    print("Count \(teachers.count)")
+})
+```
+
+To stop observing changes just dispose the disposable or alternatively add it to a dispose bag.
+```swift
+disposable.dispose()
 ```
 
 ## Author
