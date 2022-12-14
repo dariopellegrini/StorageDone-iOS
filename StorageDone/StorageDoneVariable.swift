@@ -1,5 +1,5 @@
 //
-//  File.swift
+// StorageDoneVariable.swift
 //  
 //
 //  Created by Dario Pellegrini on 14/12/22.
@@ -61,7 +61,7 @@ public struct StorageDoneVariable<T: Codable> {
     }
     
     @available(iOS 15, *)
-    public func acceptAsync(elements: [T], delete: Bool = false) async throws {
+    public func acceptAsync(elements: [T], delete: Bool = false) async {
         do {
             if delete == true {
                 try await database.async.deleteAllAndInsert(elements: elements)
@@ -150,6 +150,10 @@ public struct StorageDoneVariable<T: Codable> {
 
 extension StorageDoneDatabase {
     public func variable<T: Codable>() -> StorageDoneVariable<T> {
+        StorageDoneVariable(database: self)
+    }
+    
+    public func variable<T: Codable>(_ type: T.Type) -> StorageDoneVariable<T> {
         StorageDoneVariable(database: self)
     }
 }
