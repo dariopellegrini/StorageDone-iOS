@@ -368,6 +368,18 @@ variable.acceptAsync(elements: teachers)
 By default `accept` performs an `insertOrUpdate` operation, replacing the already existing elements and adding the new ones.
 Adding the parameter `delete` to accept functions makes `variable` perform a `deleteAllAndInsert` operation, replacing all the elements of the collection with new ones.
 
+### Observing data
+To observe data with `StorageDoneVariable` there are 2 possible ways.
+```swift
+// Rx
+variable.observable.subscribe(onNext: { teachers in })
+
+// AsyncStream
+for try await teacher in variables.asyncStream {
+    print($0.count)
+}
+```
+
 ## Author
 
 Dario Pellegrini, pellegrini.dario.1303@gmail.com
