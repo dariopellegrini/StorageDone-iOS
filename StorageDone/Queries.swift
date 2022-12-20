@@ -233,6 +233,10 @@ public func or(_ expressions: ExpressionProtocol...) -> ExpressionProtocol {
     return expression
 }
 
+public func not(_ expression: ExpressionProtocol) -> ExpressionProtocol {
+    Expression.not(expression)
+}
+
 func and(expressions: [ExpressionProtocol]) -> ExpressionProtocol {
     var expression = expressions[0]
     if (expressions.count > 1) {
