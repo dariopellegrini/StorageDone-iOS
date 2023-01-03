@@ -331,7 +331,7 @@ let teachers: [Teacher] = try await database.async(.userInitiated).get()
 ```
 
 ### Async streams
-Live queries can be represented using swift async streams.
+Live queries can be represented using Swift async streams.
 ```swift
 task = Task {
     for try await teachers: [Teacher] in database.async.live() {
