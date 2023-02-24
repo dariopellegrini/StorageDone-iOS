@@ -33,6 +33,7 @@
 		67A2CBA928BD42EC00382BB3 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		67A5FB0D2316C7040099A681 /* AdvancedQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedQuery.swift; sourceTree = "<group>"; };
 		67D0331822D3851400BD3A58 /* LiveQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveQuery.swift; sourceTree = "<group>"; };
+		67DA510529A8F71D00272671 /* StorageDone.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = StorageDone.podspec; sourceTree = "<group>"; };
 		A39F3402229850ED0086608B /* StorageDone.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StorageDone.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A39F3405229850ED0086608B /* StorageDone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StorageDone.h; sourceTree = "<group>"; };
 		A39F3406229850ED0086608B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -60,6 +61,7 @@
 		1B29BC7BEE370C76B75C0EDF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				67DA510529A8F71D00272671 /* StorageDone.podspec */,
 				DE8F8E19B5D5FB4FCB4431EC /* Pods_StorageDone.framework */,
 			);
 			name = Frameworks;
