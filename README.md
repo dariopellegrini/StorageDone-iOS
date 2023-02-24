@@ -66,24 +66,6 @@ let teachers = [Teacher(id: "id1", name: "Sarah", surname: "Jones", age: 29, cv:
 try? database.insertOrUpdate(elements: teachers)
 ```
 
-### RxSwift
-Every operation has its RxSwift version. Each can be used through rx extension
-```swift
-
-database.rx.insertOrUpdate(teachers)
-
-database.rx.insert(teachers)
-
-database.rx.get()
-
-database.rx.get(["id":"id1"])
-
-database.rx.delete(["id":"id2"])
-
-database.rx.deleteAllAndInsert(teachers)
-
-```
-
 ### Operators
 Database objects can use different custom operators, which wrap try-catch logic and give a more compact way to access database
 ```swift
@@ -208,42 +190,6 @@ In order to stop observing just call cancel on LiveQuery object.
 liveQuery.cancel()
 ```
 
-### RxSwift live queries
-
-Live queries are also available through RxSwift extensions.
-```swift
-// All elements
-let disposable = database.rx.live(Teacher.self).subscribe(onNext: {
-    teachers in
-    print("Count \(teachers.count)")
-})
-
-let disposable = database.rx.live().subscribe(onNext: {
-    (teachers: [Teacher]) in
-    print("Count \(teachers.count)")
-})
-
-// Elements with query
-let disposable = database.rx.live(Teacher.self, expression: "id".equal("id1")).subscribe(onNext: {
-    teachers in
-    print("Count \(teachers.count)")
-})
-
-let disposable = database.rx.live("id".equal("id1")).subscribe(onNext: {
-    (teachers: [Teacher]) in
-    print("Count \(teachers.count)")
-})
-```
-
-To stop observing changes just dispose the disposable or alternatively add it to a dispose bag.
-```swift
-disposable.dispose()
-
-// or
-
-disposable.disposed(by: disposeBag)
-```
-
 ## Advanced queries
 Using advanced queries lets to specify filtering expression, ordering logic and priority, limit and skip values.
 All of these parameters are optional. The only limitation is that skip is ignored if limit parameter is not present.
@@ -302,7 +248,136 @@ let teachers: [Teacher] = try self.database.search(text: text)
 let teachers: [Teacher] = try self.database.search(text: text) {
     $0.orderings = ["age".descending]
 }
+```
 
+## RxSwift
+Every operation has its RxSwift version. Each can be used through rx extension
+```swift
+
+database.rx.insertOrUpdate(teachers)
+
+database.rx.insert(teachers)
+
+database.rx.get()
+
+database.rx.get(["id":"id1"])
+
+database.rx.delete(["id":"id2"])
+
+database.rx.deleteAllAndInsert(teachers)
+
+```
+
+### RxSwift live queries
+
+Live queries are also available through RxSwift extensions.
+```swift
+// All elements
+let disposable = database.rx.live(Teacher.self).subscribe(onNext: {
+    teachers in
+    print("Count \(teachers.count)")
+})
+
+let disposable = database.rx.live().subscribe(onNext: {
+    (teachers: [Teacher]) in
+    print("Count \(teachers.count)")
+})
+
+// Elements with query
+let disposable = database.rx.live(Teacher.self, expression: "id".equal("id1")).subscribe(onNext: {
+    teachers in
+    print("Count \(teachers.count)")
+})
+
+let disposable = database.rx.live("id".equal("id1")).subscribe(onNext: {
+    (teachers: [Teacher]) in
+    print("Count \(teachers.count)")
+})
+```
+
+To stop observing changes just dispose the disposable or alternatively add it to a dispose bag.
+```swift
+disposable.dispose()
+
+// or
+
+disposable.disposed(by: disposeBag)
+```
+
+## Async await
+Every operation has its async await version. By default they are on a `.medium` priority task.
+```swift
+let teachers: [Teacher] = try await database.async.insertOrUpdate(teachers)
+
+let teachers: [Teacher] = try await database.async.insert(teachers)
+
+let teachers: [Teacher] = try await database.async.get()
+
+let teachers: [Teacher] = try await database.async.get {
+    $0.expression = "id".equal(id)
+}
+
+let teachers: [Teacher] = try await database.async.get(.expression("id".equal("id1")))
+
+let teachers: [Teacher] = try await database.async.delete(["id":"id2"])
+
+let teachers: [Teacher] = try await database.async.deleteAllAndInsert(teachers)
+
+```
+
+To run every task with a different priority simply specify it in the `async` extension.
+```swift
+let teachers: [Teacher] = try await database.async(.userInitiated).get()
+```
+
+### Async streams
+Live queries can be represented using Swift async streams.
+```swift
+task = Task {
+    for try await teachers: [Teacher] in database.async.live() {
+        print("Count \(teachers.count)")
+    }
+}
+```
+
+To stop observing changes just cancel the task.
+```swift
+task.cancel()
+```
+
+## StorageDoneVariable (beta)
+StorageDone brings `StorageDoneVariable`, a struct that tries to emulate `BehaviorSubject` features, using the local database as a data container.
+First create a `StorageDoneVariable`.
+```swift
+let variable: StorageDoneVariable<Teacher> = database.variable()
+```
+
+This object is an abstraction layer that allows one to perform read, write and observe operations on the database.
+
+### Read and write
+Read and write can be performed synchronously or asynchronously.
+```swift
+// Synchronously
+let teachers = variable.elements
+variable.accept(elements: teachers)
+
+// Asynchronously
+let teachers = await variable.asyncElements
+variable.acceptAsync(elements: teachers)
+```
+By default `accept` performs an `insertOrUpdate` operation, replacing the already existing elements and adding the new ones.
+Adding the parameter `delete` to accept functions makes `variable` perform a `deleteAllAndInsert` operation, replacing all the elements of the collection with new ones.
+
+### Observing data
+To observe data with `StorageDoneVariable` there are 2 possible ways.
+```swift
+// Rx
+variable.observable.subscribe(onNext: { teachers in })
+
+// AsyncStream
+for try await teacher in variables.asyncStream {
+    print($0.count)
+}
 ```
 
 ## Author
