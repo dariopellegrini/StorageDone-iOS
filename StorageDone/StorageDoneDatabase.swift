@@ -16,7 +16,10 @@ public struct StorageDoneDatabase {
     let name: String
     private let type = "StorageDoneType"
     
-    public init(name: String = "StorageDone") {
+    let encoder: JSONEncoder
+    let decoder: JSONDecoder
+    
+    public init(name: String = "StorageDone", encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder()) {
         if Database.log.file.config == nil {
             let tempFolder = NSTemporaryDirectory().appending("cbllog")
             Database.log.file.config = LogFileConfiguration(directory: tempFolder)
@@ -34,6 +37,8 @@ public struct StorageDoneDatabase {
         }
         
         do {
+            self.encoder = encoder
+            self.decoder = decoder
             self.database = try Database(name: name)
         } catch {
             fatalError("Error opening database")
@@ -41,8 +46,8 @@ public struct StorageDoneDatabase {
     }
     
     // MARK: - Insert or upadate
-    public func insertOrUpdate<T: Encodable>(element: T) throws {
-        let dictionary = try element.asDictionary()
+    public func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) throws {
+        var dictionary = try element.asDictionary(encoder: encoder)
         
         var document = MutableDocument()
         if let element = element as? PrimaryKey,
@@ -50,24 +55,34 @@ public struct StorageDoneDatabase {
                 $0.label != nil && $0.label == element.primaryKey()
                 }.first?.value) {
             document = MutableDocument(id: "\(primaryKeyValue)-\(String(describing: T.self))")
+            if useExistingValuesAsFallback == true,
+               let currentDictionary = database.document(withID: document.id)?.toDictionary() {
+                currentDictionary.forEach {
+                    (key, value) in
+                    if dictionary[key] == nil {
+                        dictionary[key] = value
+                    }
+                }
+            }
         }
+        
         document.setData(dictionary)
         document.setString(String(describing: T.self), forKey: type)
         
         try database.saveDocument(document)
     }
     
-    public func insertOrUpdate<T: Encodable>(elements: [T]) throws {
+    public func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool = false) throws {
         try database.inBatch {
             try elements.forEach {
-                try insertOrUpdate(element: $0)
+                try insertOrUpdate(element: $0, useExistingValuesAsFallback: useExistingValuesAsFallback)
             }
         }
     }
     
     // MARK: - Insert
     public func insert<T: Encodable>(element: T) throws {
-        let dictionary = try element.asDictionary()
+        let dictionary = try element.asDictionary(encoder: encoder)
         
         let document = MutableDocument()
         document.setData(dictionary)
@@ -101,7 +116,6 @@ public struct StorageDoneDatabase {
             .where(Expression.property(type)
                 .equalTo(Expression.string(String(describing: T.self))))
         var list = [T]()
-        let decoder = JSONDecoder()
         for result in try query.execute() {
             if let singleDictionary = result.toDictionary()[name],
                 let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
@@ -122,7 +136,6 @@ public struct StorageDoneDatabase {
                 .and(expression))
         
         var list = [T]()
-        let decoder = JSONDecoder()
         for result in try query.execute() {
             if let singleDictionary = result.toDictionary()[name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
@@ -144,7 +157,6 @@ public struct StorageDoneDatabase {
             .orderBy(orderings)
         
         var list = [T]()
-        let decoder = JSONDecoder()
         for result in try query.execute() {
             if let singleDictionary = result.toDictionary()[name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
@@ -198,7 +210,7 @@ public struct StorageDoneDatabase {
         }
         
         var list = [T]()
-        let decoder = JSONDecoder()
+        
         for result in try query.execute() {
             if let singleDictionary = result.toDictionary()[name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
@@ -443,7 +455,6 @@ public struct StorageDoneDatabase {
         let token = query.addChangeListener { (change) in
             guard let results = change.results else { return }
             var list = [T]()
-            let decoder = JSONDecoder()
             for result in results {
                 if let singleDictionary = result.toDictionary()[self.name],
                     let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
@@ -474,7 +485,6 @@ public struct StorageDoneDatabase {
         let token = query.addChangeListener { (change) in
             guard let results = change.results else { return }
             var list = [T]()
-            let decoder = JSONDecoder()
             for result in results {
                 if let singleDictionary = result.toDictionary()[self.name],
                     let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
@@ -538,7 +548,6 @@ public struct StorageDoneDatabase {
         let token = query.addChangeListener { (change) in
             guard let results = change.results else { return }
             var list = [T]()
-            let decoder = JSONDecoder()
             for result in results {
                 if let singleDictionary = result.toDictionary()[self.name],
                     let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
@@ -618,7 +627,6 @@ public struct StorageDoneDatabase {
         )
         
         var list = [T]()
-        let decoder = JSONDecoder()
         for result in try query.execute() {
             if let singleDictionary = result.toDictionary()[name],
                 let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
@@ -674,7 +682,6 @@ public struct StorageDoneDatabase {
         }
         
         var list = [T]()
-        let decoder = JSONDecoder()
         for result in try query.execute() {
             if let singleDictionary = result.toDictionary()[name],
                 let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
@@ -750,7 +757,7 @@ public struct StorageDoneDatabase {
 }
 
 extension Encodable {
-    public func asDictionary() throws -> [String: Any] {
+    public func asDictionary(encoder: JSONEncoder) throws -> [String: Any] {
         var dataElements = [String:Blob]()
         Mirror(reflecting: self).children.filter { $0.value is Data }.forEach {
             if let data = $0.value as? Data,
@@ -758,7 +765,6 @@ extension Encodable {
                 dataElements[label] = Blob(contentType: "application/binary", data: data)
             }
         }
-        let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .custom(customDataEncoder)
         let data = try encoder.encode(self)
         var dictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]

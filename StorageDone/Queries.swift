@@ -86,7 +86,7 @@ public func *==(key: String, element: Any) -> ExpressionProtocol {
     case let date as Date:
         return Expression.property(key).equalTo(Expression.double(date.timeIntervalSinceReferenceDate))
     case let value as Codable:
-        if let dictionary = try? value.asDictionary() {
+        if let dictionary = try? value.asDictionary(encoder: JSONEncoder()) {
             let expressions = dictionary.map {
                 k, v in
                 "\(key).\(k)" *== v
@@ -115,7 +115,7 @@ public func *!=(key: String, element: Any) -> ExpressionProtocol {
     case let value as Date:
         return Expression.property(key).notEqualTo(Expression.date(value))
     case let value as Codable:
-        if let dictionary = try? value.asDictionary() {
+        if let dictionary = try? value.asDictionary(encoder: JSONEncoder()) {
             let expressions = dictionary.map {
                 k, v in
                 "\(key).\(k)" *!= v

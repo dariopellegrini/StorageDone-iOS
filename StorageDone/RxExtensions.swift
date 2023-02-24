@@ -50,11 +50,11 @@ public extension RxWrapper where Base == StorageDoneDatabase {
     }
     
     // MARK: - Insert or update
-    func insertOrUpdate<T: Encodable>(element: T) -> Observable<T> {
+    func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) -> Observable<T> {
         return Observable.create {
             subscriber in
             do {
-                try self.base.insertOrUpdate(element: element)
+                try self.base.insertOrUpdate(element: element, useExistingValuesAsFallback: useExistingValuesAsFallback)
                 subscriber.onNext(element)
                 subscriber.onCompleted()
             } catch let e {
@@ -64,11 +64,11 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func insertOrUpdate<T: Encodable>(elements: [T]) -> Observable<[T]> {
+    func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool) -> Observable<[T]> {
         return Observable.create {
             subscriber in
             do {
-                try self.base.insertOrUpdate(elements: elements)
+                try self.base.insertOrUpdate(elements: elements, useExistingValuesAsFallback: useExistingValuesAsFallback)
                 subscriber.onNext(elements)
                 subscriber.onCompleted()
             } catch let e {

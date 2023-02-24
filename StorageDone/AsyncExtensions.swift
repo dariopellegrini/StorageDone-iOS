@@ -46,15 +46,15 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
     }
     
     // MARK: - Insert or update
-    func insertOrUpdate<T: Encodable>(element: T) async throws {
+    func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) async throws {
         try await Task(priority: priority) {
-            try self.base.insertOrUpdate(element: element)
+            try self.base.insertOrUpdate(element: element, useExistingValuesAsFallback: useExistingValuesAsFallback)
         }.value
     }
     
-    func insertOrUpdate<T: Encodable>(elements: [T]) async throws {
+    func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool = false) async throws {
         try await Task(priority: priority) {
-            try self.base.insertOrUpdate(elements: elements)
+            try self.base.insertOrUpdate(elements: elements, useExistingValuesAsFallback: useExistingValuesAsFallback)
         }.value
     }
     

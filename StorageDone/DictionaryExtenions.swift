@@ -30,7 +30,7 @@ extension Dictionary where Key == String {
             case let value as Date:
                 whereExpression = whereExpression.and(Expression.property(key).equalTo(Expression.date(value)))
             case let value as Codable:
-                if let dictionary = try? value.asDictionary() {
+                if let dictionary = try? value.asDictionary(encoder: JSONEncoder()) {
                     whereExpression = whereExpression.and(Expression.property(key).equalTo(Expression.dictionary(dictionary)))
                 }
             default:
