@@ -12,17 +12,17 @@ import Combine
 extension StorageDoneDatabase {
     
     @available(iOS 14.0, *)
-    func publisher<T: Codable>(_ type: T.Type) -> StorageDonePublisher<T> {
+    public func publisher<T: Codable>(_ type: T.Type) -> StorageDonePublisher<T> {
         StorageDonePublisher(storageDoneDatabase: self)
     }
 }
 
 @available(iOS 14, *)
-struct StorageDonePublisher<T: Codable>: Publisher {
+public struct StorageDonePublisher<T: Codable>: Publisher {
     // Declaring that our publisher doesn't emit any values,
     // and that it can never fail:
-    typealias Output = [T]
-    typealias Failure = Never
+    public typealias Output = [T]
+    public typealias Failure = Never
     
     let storageDoneDatabase: StorageDoneDatabase
     
@@ -30,7 +30,7 @@ struct StorageDonePublisher<T: Codable>: Publisher {
     // a new object started observing it. Within this method,
     // we'll need to create a subscription instance and
     // attach it to the new subscriber:
-    func receive<S: Subscriber>(
+    public func receive<S: Subscriber>(
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
         
@@ -48,7 +48,7 @@ struct StorageDonePublisher<T: Codable>: Publisher {
 }
 
 @available(iOS 14.0, *)
-class StorageDoneSubscription<Target: Subscriber, C: Codable>: Subscription
+public class StorageDoneSubscription<Target: Subscriber, C: Codable>: Subscription
 where Target.Input == [C] {
     
     let storageDoneDatabase: StorageDoneDatabase
@@ -64,9 +64,9 @@ where Target.Input == [C] {
     // simply emit events according to its underlying UIControl
     // instance, but we still have to implement this method
     // in order to conform to the Subscription protocol:
-    func request(_ demand: Subscribers.Demand) {}
+    public func request(_ demand: Subscribers.Demand) {}
     
-    func cancel() {
+    public func cancel() {
         // When our subscription was cancelled, we'll release
         // the reference to our target to prevent any
         // additional events from being sent to it:
