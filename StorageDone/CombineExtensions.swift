@@ -5,9 +5,9 @@
 //  Created by Dario Pellegrini on 23/03/23.
 //  Copyright © 2023 Dario Pellegrini. All rights reserved.
 //
-
-import Foundation
 import Combine
+import CouchbaseLiteSwift
+import Foundation
 
 extension StorageDoneDatabase {
     
@@ -26,6 +26,27 @@ public struct StorageDonePublisher<T: Codable>: Publisher {
     
     let storageDoneDatabase: StorageDoneDatabase
     
+    let expressionProtocol: ExpressionProtocol?
+    let advancedQuery: ((AdvancedQuery) -> ())?
+    
+    init(storageDoneDatabase: StorageDoneDatabase) {
+        self.storageDoneDatabase = storageDoneDatabase
+        self.expressionProtocol = nil
+        self.advancedQuery = nil
+    }
+    
+    init(storageDoneDatabase: StorageDoneDatabase, expressionProtocol: ExpressionProtocol) {
+        self.storageDoneDatabase = storageDoneDatabase
+        self.expressionProtocol = expressionProtocol
+        self.advancedQuery = nil
+    }
+    
+    init(storageDoneDatabase: StorageDoneDatabase, advancedQuery: @escaping (AdvancedQuery) -> ()) {
+        self.storageDoneDatabase = storageDoneDatabase
+        self.expressionProtocol = nil
+        self.advancedQuery = advancedQuery
+    }
+    
     // Combine will call this method on our publisher whenever
     // a new object started observing it. Within this method,
     // we'll need to create a subscription instance and
@@ -38,8 +59,18 @@ public struct StorageDonePublisher<T: Codable>: Publisher {
         let subscription = StorageDoneSubscription<S, T>(storageDoneDatabase: storageDoneDatabase)
         subscription.target = subscriber
         
-        subscription.liveQuery = try? storageDoneDatabase.live {
-            subscription.trigger(elements: $0)
+        if let expressionProtocol {
+            subscription.liveQuery = try? storageDoneDatabase.live(expressionProtocol) {
+                subscription.trigger(elements: $0)
+            }
+        } else if let advancedQuery {
+            subscription.liveQuery = try? storageDoneDatabase.live(advancedQuery) {
+                subscription.trigger(elements: $0)
+            }
+        } else {
+            subscription.liveQuery = try? storageDoneDatabase.live {
+                subscription.trigger(elements: $0)
+            }
         }
         
         // Attaching our subscription to the subscriber:
