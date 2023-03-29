@@ -15,6 +15,14 @@ extension StorageDoneDatabase {
     public func publisher<T: Codable>(_ type: T.Type) -> StorageDonePublisher<T> {
         StorageDonePublisher(storageDoneDatabase: self)
     }
+    
+    public func publisher<T: Codable>(_ type: T.Type, _ expressionProtocol: ExpressionProtocol) -> StorageDonePublisher<T> {
+        StorageDonePublisher(storageDoneDatabase: self, expressionProtocol: expressionProtocol)
+    }
+    
+    public func publisher<T: Codable>(_ type: T.Type, using: @escaping (AdvancedQuery) -> ()) -> StorageDonePublisher<T> {
+        StorageDonePublisher(storageDoneDatabase: self, advancedQueryClosure: using)
+    }
 }
 
 @available(iOS 14, *)
@@ -27,24 +35,24 @@ public struct StorageDonePublisher<T: Codable>: Publisher {
     let storageDoneDatabase: StorageDoneDatabase
     
     let expressionProtocol: ExpressionProtocol?
-    let advancedQuery: ((AdvancedQuery) -> ())?
+    let advancedQueryClosure: ((AdvancedQuery) -> ())?
     
     init(storageDoneDatabase: StorageDoneDatabase) {
         self.storageDoneDatabase = storageDoneDatabase
         self.expressionProtocol = nil
-        self.advancedQuery = nil
+        self.advancedQueryClosure = nil
     }
     
     init(storageDoneDatabase: StorageDoneDatabase, expressionProtocol: ExpressionProtocol) {
         self.storageDoneDatabase = storageDoneDatabase
         self.expressionProtocol = expressionProtocol
-        self.advancedQuery = nil
+        self.advancedQueryClosure = nil
     }
     
-    init(storageDoneDatabase: StorageDoneDatabase, advancedQuery: @escaping (AdvancedQuery) -> ()) {
+    init(storageDoneDatabase: StorageDoneDatabase, advancedQueryClosure: @escaping (AdvancedQuery) -> ()) {
         self.storageDoneDatabase = storageDoneDatabase
         self.expressionProtocol = nil
-        self.advancedQuery = advancedQuery
+        self.advancedQueryClosure = advancedQueryClosure
     }
     
     // Combine will call this method on our publisher whenever
@@ -63,8 +71,8 @@ public struct StorageDonePublisher<T: Codable>: Publisher {
             subscription.liveQuery = try? storageDoneDatabase.live(expressionProtocol) {
                 subscription.trigger(elements: $0)
             }
-        } else if let advancedQuery {
-            subscription.liveQuery = try? storageDoneDatabase.live(advancedQuery) {
+        } else if let advancedQueryClosure {
+            subscription.liveQuery = try? storageDoneDatabase.live(advancedQueryClosure) {
                 subscription.trigger(elements: $0)
             }
         } else {
