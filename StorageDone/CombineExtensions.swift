@@ -16,10 +16,12 @@ extension StorageDoneDatabase {
         StorageDonePublisher(storageDoneDatabase: self)
     }
     
+    @available(iOS 14.0, *)
     public func publisher<T: Codable>(_ type: T.Type, _ expressionProtocol: ExpressionProtocol) -> StorageDonePublisher<T> {
         StorageDonePublisher(storageDoneDatabase: self, expressionProtocol: expressionProtocol)
     }
     
+    @available(iOS 14.0, *)
     public func publisher<T: Codable>(_ type: T.Type, using: @escaping (AdvancedQuery) -> ()) -> StorageDonePublisher<T> {
         StorageDonePublisher(storageDoneDatabase: self, advancedQueryClosure: using)
     }
