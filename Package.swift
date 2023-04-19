@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         .package(name: "CouchbaseLiteSwift",
             url: "https://github.com/couchbase/couchbase-lite-ios.git",
-            from: "3.0.2"),
+            from: "3.0.0"),
         .package(name: "RxSwift",
             url: "https://github.com/ReactiveX/RxSwift.git",
             from: "6.5.0")
