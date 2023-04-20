@@ -360,21 +360,6 @@ database.publisher(Teacher.self) {
 
 ```
 
-## Combine
-StorageDone has the function `publisher` which let to observe any change as well as live queries.
-```swift
-database.publisher(Teacher.self).sink { ... }
-
-database.publisher(Teacher.self, "id".equal(id)).sink { ... }
-
-database.publisher(Teacher.self) {
-            $0.expression = "id".equal(id)
-            $0.orderings = ["name".ascending]
-            $0.limit = 10
-        }.sink { ... }
-
-```
-
 ## SwiftUI
 Taking as inspiration the `@AppStorage` property wrapper, StorageDone integrates its property wrapper to make it easy to save and observe database persistent data.
 
