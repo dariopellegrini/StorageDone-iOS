@@ -40,6 +40,9 @@ public struct StorageDoneDatabase {
             self.encoder = encoder
             self.decoder = decoder
             self.database = try Database(name: name)
+            let index = IndexBuilder.valueIndex(items:
+                ValueIndexItem.expression(Expression.property(type)))
+            try self.database.createIndex(index, withName: "\(type)Index")
         } catch {
             fatalError("Error opening database")
         }
