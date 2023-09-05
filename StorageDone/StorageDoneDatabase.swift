@@ -324,40 +324,11 @@ public struct StorageDoneDatabase {
         }
     }
     
-    public func delete<T>(_ elementType: T.Type, whereExpressions: [ExpressionProtocol], batch: Bool = true) throws {
-        var whereExpression = Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-        whereExpressions.forEach {
-            whereExpression = whereExpression.and($0)
-        }
-        
-        let query = QueryBuilder
-            .select(SelectResult.expression(Meta.id))
-            .from(DataSource.collection(collection(T.self)))
-            .where(whereExpression)
-        
-        if batch == true {
-            try database.inBatch {
-                for result in try query.execute() {
-                    if let id = result.string(forKey: "id") {
-                        try collection(T.self).purge(id: id)
-                    }
-                }
-            }
-        } else {
-            for result in try query.execute() {
-                if let id = result.string(forKey: "id") {
-                    try collection(T.self).purge(id: id)
-                }
-            }
-        }
-    }
-    
     public func delete<T>(_ elementType: T.Type, _ expression: ExpressionProtocol, batch: Bool = true) throws {
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
             .from(DataSource.collection(collection(T.self)))
-            .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                .and(expression))
+            .where(expression)
         
         if batch == true {
             try database.inBatch {
