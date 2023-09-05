@@ -43,7 +43,7 @@ public struct StorageDoneDatabase {
             self.encoder = encoder
             self.decoder = decoder
             self.database = try Database(name: name)
-            self.defaultCollection = try database.defaultCollection()
+            self.defaultCollection = try database.collection(name: name) ?? (try database.createCollection(name: name))
             let index = IndexBuilder.valueIndex(items:
                 ValueIndexItem.expression(Expression.property(type)))
             try defaultCollection.createIndex(index, name: "\(type)Index")
