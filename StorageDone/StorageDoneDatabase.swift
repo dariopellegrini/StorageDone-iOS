@@ -7,6 +7,7 @@
 //
 
 import CouchbaseLiteSwift
+import CouchbaseLiteSwift.Swift
 import Foundation
 
 public typealias CodablePrimaryKey = Codable & PrimaryKey
@@ -18,6 +19,8 @@ public struct StorageDoneDatabase {
     
     let encoder: JSONEncoder
     let decoder: JSONDecoder
+    
+    let defaultCollection: Collection
     
     public init(name: String = "StorageDone", encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder()) {
         if Database.log.file.config == nil {
@@ -40,9 +43,10 @@ public struct StorageDoneDatabase {
             self.encoder = encoder
             self.decoder = decoder
             self.database = try Database(name: name)
+            self.defaultCollection = try database.defaultCollection()
             let index = IndexBuilder.valueIndex(items:
                 ValueIndexItem.expression(Expression.property(type)))
-            try self.database.createIndex(index, withName: "\(type)Index")
+            try defaultCollection.createIndex(index, name: "\(type)Index")
         } catch {
             fatalError("Error opening database")
         }
@@ -59,7 +63,7 @@ public struct StorageDoneDatabase {
                 }.first?.value) {
             document = MutableDocument(id: "\(primaryKeyValue)-\(String(describing: T.self))")
             if useExistingValuesAsFallback == true,
-               let currentDictionary = database.document(withID: document.id)?.toDictionary() {
+               let currentDictionary = try defaultCollection.document(id: document.id)?.toDictionary() {
                 currentDictionary.forEach {
                     (key, value) in
                     if dictionary[key] == nil {
@@ -72,7 +76,7 @@ public struct StorageDoneDatabase {
         document.setData(dictionary)
         document.setString(String(describing: T.self), forKey: type)
         
-        try database.saveDocument(document)
+        try defaultCollection.save(document: document)
     }
     
     public func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool = false) throws {
@@ -91,7 +95,7 @@ public struct StorageDoneDatabase {
         document.setData(dictionary)
         document.setString(String(describing: T.self), forKey: type)
         
-        try database.saveDocument(document)
+        try defaultCollection.save(document: document)
     }
     
     public func insert<T: Encodable>(elements: [T]) throws {
@@ -115,7 +119,7 @@ public struct StorageDoneDatabase {
     public func get<T: Decodable>() throws -> [T] {
         let query = QueryBuilder
             .select(SelectResult.all())
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(Expression.property(type)
                 .equalTo(Expression.string(String(describing: T.self))))
         var list = [T]()
@@ -134,7 +138,7 @@ public struct StorageDoneDatabase {
         let query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
         
@@ -154,7 +158,7 @@ public struct StorageDoneDatabase {
         let query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
             .orderBy(orderings)
@@ -180,7 +184,7 @@ public struct StorageDoneDatabase {
         var query: Query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
 
         if let from = query as? From {
             if let expression = advancedQuery.expression {
@@ -273,7 +277,7 @@ public struct StorageDoneDatabase {
     public func delete<T>(_ elementType: T.Type, batch: Bool = true) throws{
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(Expression.property(type)
                 .equalTo(Expression.string(String(describing: T.self))))
         
@@ -281,14 +285,14 @@ public struct StorageDoneDatabase {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try database.purgeDocument(withID: id)
+                        try defaultCollection.purge(id: id)
                     }
                 }
             }
         } else {
             for result in try query.execute() {
                 if let id = result.string(forKey: "id") {
-                    try database.purgeDocument(withID: id)
+                    try defaultCollection.purge(id: id)
                 }
             }
         }
@@ -299,21 +303,21 @@ public struct StorageDoneDatabase {
         
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(whereExpression)
         
         if batch == true {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try database.purgeDocument(withID: id)
+                        try defaultCollection.purge(id: id)
                     }
                 }
             }
         } else {
             for result in try query.execute() {
                 if let id = result.string(forKey: "id") {
-                    try database.purgeDocument(withID: id)
+                    try defaultCollection.purge(id: id)
                 }
             }
         }
@@ -327,21 +331,21 @@ public struct StorageDoneDatabase {
         
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(whereExpression)
         
         if batch == true {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try database.purgeDocument(withID: id)
+                        try defaultCollection.purge(id: id)
                     }
                 }
             }
         } else {
             for result in try query.execute() {
                 if let id = result.string(forKey: "id") {
-                    try database.purgeDocument(withID: id)
+                    try defaultCollection.purge(id: id)
                 }
             }
         }
@@ -350,7 +354,7 @@ public struct StorageDoneDatabase {
     public func delete<T>(_ elementType: T.Type, _ expression: ExpressionProtocol, batch: Bool = true) throws {
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
         
@@ -358,14 +362,14 @@ public struct StorageDoneDatabase {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try database.purgeDocument(withID: id)
+                        try defaultCollection.purge(id: id)
                     }
                 }
             }
         } else {
             for result in try query.execute() {
                 if let id = result.string(forKey: "id") {
-                    try database.purgeDocument(withID: id)
+                    try defaultCollection.purge(id: id)
                 }
             }
         }
@@ -375,10 +379,9 @@ public struct StorageDoneDatabase {
         if let primaryKeyValue = (Mirror(reflecting: element).children.filter {
             $0.label != nil && $0.label == element.primaryKey()
             }.first?.value),
-            let document = database.document(withID: "\(primaryKeyValue)-\(String(describing: T.self))") {
+           let document = try defaultCollection.document(id: "\(primaryKeyValue)-\(String(describing: T.self))") {
             if String(describing: T.self) == document.string(forKey: type) {
-                try database.purgeDocument(document)
-            }
+                try defaultCollection.purge(document: document)            }
         }
     }
     
@@ -431,14 +434,14 @@ public struct StorageDoneDatabase {
     public func purgeDeletedDocuments() throws {
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(Meta.isDeleted)
         
         do {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try database.purgeDocument(withID: id)
+                        try defaultCollection.purge(id: id)
                     }
                 }
             }
@@ -451,7 +454,7 @@ public struct StorageDoneDatabase {
     public func live<T: Codable>(_ classType: T.Type, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
         let query = QueryBuilder
             .select(SelectResult.all())
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(Expression.property(type)
                 .equalTo(Expression.string(String(describing: T.self))))
         
@@ -481,7 +484,7 @@ public struct StorageDoneDatabase {
         let query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
         
@@ -516,7 +519,7 @@ public struct StorageDoneDatabase {
         var query: Query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
         
         if let from = query as? From {
             if let expression = advancedQuery.expression {
@@ -615,18 +618,18 @@ public struct StorageDoneDatabase {
     
     // MARK: - Fulltext
     public func fulltextIndex<T>(_ type: T.Type, values: String...) throws {
-        try database.createIndex(IndexBuilder.fullTextIndex(items: values.map {
+        try defaultCollection.createIndex(IndexBuilder.fullTextIndex(items: values.map {
             FullTextIndexItem.property($0)
-        }), withName: "\(String(describing: T.self))-index")
+        }), name: "\(String(describing: T.self))-index")
     }
     
     public func search<T: Decodable>(_ text: String) throws -> [T] {
         let query = QueryBuilder
             .select(SelectResult.all())
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
             .where(
                 Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                .and(FullTextFunction.match(indexName: "\(String(describing: T.self))-index", query: "'\(text)'"))
+                    .and(FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'"))
         )
         
         var list = [T]()
@@ -649,17 +652,17 @@ public struct StorageDoneDatabase {
         var query: Query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(defaultCollection))
         
         if let from = query as? From {
             if let expression = advancedQuery.expression {
                 query = from.where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                    .and(FullTextFunction.match(indexName: "\(String(describing: T.self))-index", query: "'\(text)'"))
+                    .and(FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'"))
                     .and(expression))
             } else {
                 query = from.where(Expression.property(type)
                     .equalTo(Expression.string(String(describing: T.self)))
-                    .and(FullTextFunction.match(indexName: "\(String(describing: T.self))-index", query: "'\(text)'"))
+                    .and(FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'"))
                 )
             }
         }
@@ -743,19 +746,18 @@ public struct StorageDoneDatabase {
     public func save(data: Data, id: String) throws {
         let mutableDocument = MutableDocument(id: id)
         mutableDocument.setBlob(Blob(contentType: "application/binary", data: data), forKey: "data")
-        try database.saveDocument(mutableDocument)
+        try defaultCollection.save(document: mutableDocument)
     }
     
     public func getData(id: String) -> Data? {
-        let document = database.document(withID: id)
-        return document?.blob(forKey: "data")?.content
+        if let document = try? defaultCollection.document(id: id) {
+            return document.blob(forKey: "data")?.content
+        }
+        return nil
     }
     
     public func deleteData(id: String) throws {
-        if let document = database.document(withID: id) {
-            try database.purgeDocument(document)
-//            try database.deleteDocument(document)
-        }
+        try defaultCollection.purge(id: id)
     }
 }
 
