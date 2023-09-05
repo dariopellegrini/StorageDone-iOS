@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "StorageDone"
-  spec.version      = "0.12.9"
+  spec.version      = "0.12.10"
   spec.summary      = "Swift library to make easy using local document-oriented databases in iOS apps."
 
   # This description is used to generate tags and improve search results.
@@ -72,7 +72,7 @@ Pod::Spec.new do |spec|
   # spec.watchos.deployment_target = "2.0"
   # spec.tvos.deployment_target = "9.0"
 
-  spec.dependency 'CouchbaseLite-Swift', '~> 3.0.2'
+  spec.dependency 'CouchbaseLite-Swift', '~> 3.1.1'
   spec.dependency 'RxSwift'
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
