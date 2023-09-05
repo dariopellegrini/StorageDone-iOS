@@ -345,6 +345,46 @@ To stop observing changes just cancel the task.
 task.cancel()
 ```
 
+## Combine
+StorageDone has the function `publisher` which let to observe any change as well as live queries.
+```swift
+database.publisher(Teacher.self).sink { ... }
+
+database.publisher(Teacher.self, "id".equal(id)).sink { ... }
+
+database.publisher(Teacher.self) {
+            $0.expression = "id".equal(id)
+            $0.orderings = ["name".ascending]
+            $0.limit = 10
+        }.sink { ... }
+
+```
+
+## SwiftUI
+Taking as inspiration the `@AppStorage` property wrapper, StorageDone integrates its property wrapper to make it easy to save and observe database persistent data.
+
+Add the `AppStorageDone` property wrapper, giving as input the name of the database. Other constructors are available for this. This will create an array of the specified type that will persist in the database.
+```swift
+@AppStorageDone(databaseName: "saiyans") var saiyans: [Saiyan]
+```
+After that, any update of `saiyans` will persist on the database and update every view bound to it.
+```swift
+saiyans.append(Saiyan(name: "Goku"))
+
+saiyans.remove(at: 0)
+
+saiyans[i].superSaiyan.toggle()
+```
+
+Add `AppStorageDoneValue` property wrapper, giving as input the name of the database and an id. It is very similar to `AppStorage` property wrapper. This will create an object that will be saved on the database. The initial value is a default. This means that is ignored if another one is present in the database.
+```swift
+@AppStorageDoneValue(databaseName: "saiyans", id: "planet") var planet = Planet(name: "Earth")
+```
+Any update will persist on the database and update any view bound to it.
+```swift
+planet.name = "Namek"
+```
+
 ## StorageDoneVariable (beta)
 StorageDone brings `StorageDoneVariable`, a struct that tries to emulate `BehaviorSubject` features, using the local database as a data container.
 First create a `StorageDoneVariable`.
