@@ -423,13 +423,13 @@ public struct StorageDoneDatabase {
     }
     
     // MARK: - Live
-    public func live<T: Codable>(_ classType: T.Type, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+    public func live<T: Codable>(_ classType: T.Type, dispatchQueue: DispatchQueue? = nil, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
         let collection = collection(T.self)
         let query = QueryBuilder
             .select(SelectResult.all())
             .from(DataSource.collection(collection))
         
-        let token = query.addChangeListener { (change) in
+        let token = query.addChangeListener(withQueue: dispatchQueue) { (change) in
             guard let results = change.results else { return }
             var list = [T]()
             for result in results {
@@ -447,18 +447,18 @@ public struct StorageDoneDatabase {
         return LiveQuery(query: query, token: token)
     }
     
-    public func live<T: Codable>(_ closure: @escaping ([T]) -> ()) throws -> LiveQuery {
-        return try live(T.self, closure: closure)
+    public func live<T: Codable>(dispatchQueue: DispatchQueue? = nil, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        return try live(T.self, dispatchQueue: dispatchQueue, closure: closure)
     }
     
-    public func live<T: Codable>(_ classType: T.Type, expression: ExpressionProtocol, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+    public func live<T: Codable>(_ classType: T.Type, expression: ExpressionProtocol, dispatchQueue: DispatchQueue? = nil, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
         let query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
             .from(DataSource.collection(collection(T.self)))
             .where(expression)
         
-        let token = query.addChangeListener(withQueue: DispatchQueue.global(qos: .utility)) { (change) in
+        let token = query.addChangeListener(withQueue: dispatchQueue) { (change) in
             guard let results = change.results else { return }
             var list = [T]()
             for result in results {
@@ -476,12 +476,12 @@ public struct StorageDoneDatabase {
         return LiveQuery(query: query, token: token)
     }
     
-    public func live<T: Codable>(_ expression: ExpressionProtocol, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
-        return try live(T.self, expression: expression, closure: closure)
+    public func live<T: Codable>(_ expression: ExpressionProtocol, dispatchQueue: DispatchQueue? = nil, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        return try live(T.self, expression: expression, dispatchQueue: dispatchQueue, closure: closure)
     }
     
     // MARK: - Live with advanced queries
-    public func live<T: Codable>(_ classType: T.Type, using: (AdvancedQuery) -> (), closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+    public func live<T: Codable>(_ classType: T.Type, using: (AdvancedQuery) -> (), dispatchQueue: DispatchQueue? = nil, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
         
         let advancedQuery = AdvancedQuery()
         using(advancedQuery)
@@ -519,7 +519,7 @@ public struct StorageDoneDatabase {
             }
         }
         
-        let token = query.addChangeListener { (change) in
+        let token = query.addChangeListener(withQueue: dispatchQueue) { (change) in
             guard let results = change.results else { return }
             var list = [T]()
             for result in results {
@@ -537,11 +537,11 @@ public struct StorageDoneDatabase {
         return LiveQuery(query: query, token: token)
     }
     
-    public func live<T: Codable>(_ using: (AdvancedQuery) -> (), closure: @escaping ([T]) -> ()) throws -> LiveQuery {
-        return try live(T.self, using: using, closure: closure)
+    public func live<T: Codable>(_ using: (AdvancedQuery) -> (), dispatchQueue: DispatchQueue? = nil, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        return try live(T.self, using: using, dispatchQueue: dispatchQueue, closure: closure)
     }
     
-    public func live<T: Codable>(_ options: [QueryOption], closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+    public func live<T: Codable>(_ options: [QueryOption], dispatchQueue: DispatchQueue? = nil, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
         var expressionsArray = [ExpressionProtocol]()
         var orderingsArray = [OrderingProtocol]()
         var limitValue: Int? = nil
@@ -577,11 +577,11 @@ public struct StorageDoneDatabase {
                     $0.skip = skip
                 }
             }
-        }, closure: closure)
+        }, dispatchQueue: dispatchQueue, closure: closure)
     }
     
-    public func live<T: Codable>(_ options: QueryOption..., closure: @escaping ([T]) -> ()) throws -> LiveQuery {
-        return try live(options, closure: closure)
+    public func live<T: Codable>(_ options: QueryOption..., dispatchQueue: DispatchQueue? = nil, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        return try live(options, dispatchQueue: dispatchQueue, closure: closure)
     }
     
     // MARK: - Fulltext

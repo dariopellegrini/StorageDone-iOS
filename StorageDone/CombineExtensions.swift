@@ -12,18 +12,18 @@ import Foundation
 extension StorageDoneDatabase {
     
     @available(iOS 14.0, *)
-    public func publisher<T: Codable>(_ type: T.Type) -> StorageDonePublisher<T> {
-        StorageDonePublisher(storageDoneDatabase: self)
+    public func publisher<T: Codable>(_ type: T.Type, dispatchQueue: DispatchQueue? = DispatchQueue.global(qos: .utility)) -> StorageDonePublisher<T> {
+        StorageDonePublisher(storageDoneDatabase: self, dispatchQueue: dispatchQueue)
     }
     
     @available(iOS 14.0, *)
-    public func publisher<T: Codable>(_ type: T.Type, _ expressionProtocol: ExpressionProtocol) -> StorageDonePublisher<T> {
-        StorageDonePublisher(storageDoneDatabase: self, expressionProtocol: expressionProtocol)
+    public func publisher<T: Codable>(_ type: T.Type, _ expressionProtocol: ExpressionProtocol, dispatchQueue: DispatchQueue? = DispatchQueue.global(qos: .utility)) -> StorageDonePublisher<T> {
+        StorageDonePublisher(storageDoneDatabase: self, expressionProtocol: expressionProtocol, dispatchQueue: dispatchQueue)
     }
     
     @available(iOS 14.0, *)
-    public func publisher<T: Codable>(_ type: T.Type, using: @escaping (AdvancedQuery) -> ()) -> StorageDonePublisher<T> {
-        StorageDonePublisher(storageDoneDatabase: self, advancedQueryClosure: using)
+    public func publisher<T: Codable>(_ type: T.Type, dispatchQueue: DispatchQueue? = DispatchQueue.global(qos: .utility), using: @escaping (AdvancedQuery) -> ()) -> StorageDonePublisher<T> {
+        StorageDonePublisher(storageDoneDatabase: self, dispatchQueue: dispatchQueue, advancedQueryClosure: using)
     }
 }
 
@@ -38,23 +38,27 @@ public struct StorageDonePublisher<T: Codable>: Publisher {
     
     let expressionProtocol: ExpressionProtocol?
     let advancedQueryClosure: ((AdvancedQuery) -> ())?
+    let dispatchQueue: DispatchQueue?
     
-    init(storageDoneDatabase: StorageDoneDatabase) {
+    init(storageDoneDatabase: StorageDoneDatabase, dispatchQueue: DispatchQueue? = nil) {
         self.storageDoneDatabase = storageDoneDatabase
         self.expressionProtocol = nil
         self.advancedQueryClosure = nil
+        self.dispatchQueue = dispatchQueue
     }
     
-    init(storageDoneDatabase: StorageDoneDatabase, expressionProtocol: ExpressionProtocol) {
+    init(storageDoneDatabase: StorageDoneDatabase, expressionProtocol: ExpressionProtocol, dispatchQueue: DispatchQueue? = nil) {
         self.storageDoneDatabase = storageDoneDatabase
         self.expressionProtocol = expressionProtocol
         self.advancedQueryClosure = nil
+        self.dispatchQueue = dispatchQueue
     }
     
-    init(storageDoneDatabase: StorageDoneDatabase, advancedQueryClosure: @escaping (AdvancedQuery) -> ()) {
+    init(storageDoneDatabase: StorageDoneDatabase, dispatchQueue: DispatchQueue? = nil, advancedQueryClosure: @escaping (AdvancedQuery) -> ()) {
         self.storageDoneDatabase = storageDoneDatabase
         self.expressionProtocol = nil
         self.advancedQueryClosure = advancedQueryClosure
+        self.dispatchQueue = dispatchQueue
     }
     
     // Combine will call this method on our publisher whenever
@@ -70,15 +74,15 @@ public struct StorageDonePublisher<T: Codable>: Publisher {
         subscription.target = subscriber
         
         if let expressionProtocol {
-            subscription.liveQuery = try? storageDoneDatabase.live(expressionProtocol) {
+            subscription.liveQuery = try? storageDoneDatabase.live(expressionProtocol, dispatchQueue: dispatchQueue) {
                 subscription.trigger(elements: $0)
             }
         } else if let advancedQueryClosure {
-            subscription.liveQuery = try? storageDoneDatabase.live(advancedQueryClosure) {
+            subscription.liveQuery = try? storageDoneDatabase.live(advancedQueryClosure, dispatchQueue: dispatchQueue) {
                 subscription.trigger(elements: $0)
             }
         } else {
-            subscription.liveQuery = try? storageDoneDatabase.live {
+            subscription.liveQuery = try? storageDoneDatabase.live(dispatchQueue: dispatchQueue) {
                 subscription.trigger(elements: $0)
             }
         }
