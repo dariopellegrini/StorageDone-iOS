@@ -43,12 +43,21 @@ public struct StorageDoneDatabase {
             self.encoder = encoder
             self.decoder = decoder
             self.database = try Database(name: name)
-            self.defaultCollection = try database.collection(name: name) ?? (try database.createCollection(name: name))
+            self.defaultCollection = try database.collection(name: "default\(name)") ?? (try database.createCollection(name: "default\(name)"))
             let index = IndexBuilder.valueIndex(items:
                 ValueIndexItem.expression(Expression.property(type)))
             try defaultCollection.createIndex(index, name: "\(type)Index")
         } catch {
             fatalError("Error opening database")
+        }
+    }
+    
+    // MARK: - Collections
+    func collection<T>(_ type: T.Type) -> Collection {
+        do {
+            return try database.collection(name: String(describing: T.self), scope: String(describing: T.self)) ?? (try database.createCollection(name: String(describing: T.self), scope: String(describing: T.self)))
+        } catch let e {
+            fatalError(e.localizedDescription)
         }
     }
     
@@ -63,7 +72,7 @@ public struct StorageDoneDatabase {
                 }.first?.value) {
             document = MutableDocument(id: "\(primaryKeyValue)-\(String(describing: T.self))")
             if useExistingValuesAsFallback == true,
-               let currentDictionary = try defaultCollection.document(id: document.id)?.toDictionary() {
+               let currentDictionary = try collection(T.self).document(id: document.id)?.toDictionary() {
                 currentDictionary.forEach {
                     (key, value) in
                     if dictionary[key] == nil {
@@ -76,7 +85,7 @@ public struct StorageDoneDatabase {
         document.setData(dictionary)
         document.setString(String(describing: T.self), forKey: type)
         
-        try defaultCollection.save(document: document)
+        try collection(T.self).save(document: document)
     }
     
     public func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool = false) throws {
@@ -93,9 +102,8 @@ public struct StorageDoneDatabase {
         
         let document = MutableDocument()
         document.setData(dictionary)
-        document.setString(String(describing: T.self), forKey: type)
         
-        try defaultCollection.save(document: document)
+        try collection(T.self).save(document: document)
     }
     
     public func insert<T: Encodable>(elements: [T]) throws {
@@ -119,9 +127,8 @@ public struct StorageDoneDatabase {
     public func get<T: Decodable>() throws -> [T] {
         let query = QueryBuilder
             .select(SelectResult.all())
-            .from(DataSource.collection(defaultCollection))
-            .where(Expression.property(type)
-                .equalTo(Expression.string(String(describing: T.self))))
+            .from(DataSource.collection(collection(T.self)))
+        
         var list = [T]()
         for result in try query.execute() {
             if let singleDictionary = result.toDictionary()[name],
@@ -138,7 +145,7 @@ public struct StorageDoneDatabase {
         let query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
         
@@ -158,7 +165,7 @@ public struct StorageDoneDatabase {
         let query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
             .orderBy(orderings)
@@ -184,7 +191,7 @@ public struct StorageDoneDatabase {
         var query: Query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
 
         if let from = query as? From {
             if let expression = advancedQuery.expression {
@@ -277,22 +284,20 @@ public struct StorageDoneDatabase {
     public func delete<T>(_ elementType: T.Type, batch: Bool = true) throws{
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
-            .where(Expression.property(type)
-                .equalTo(Expression.string(String(describing: T.self))))
+            .from(DataSource.collection(collection(T.self)))
         
         if batch == true {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try defaultCollection.purge(id: id)
+                        try collection(T.self).purge(id: id)
                     }
                 }
             }
         } else {
             for result in try query.execute() {
                 if let id = result.string(forKey: "id") {
-                    try defaultCollection.purge(id: id)
+                    try collection(T.self).purge(id: id)
                 }
             }
         }
@@ -303,21 +308,21 @@ public struct StorageDoneDatabase {
         
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
             .where(whereExpression)
         
         if batch == true {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try defaultCollection.purge(id: id)
+                        try collection(T.self).purge(id: id)
                     }
                 }
             }
         } else {
             for result in try query.execute() {
                 if let id = result.string(forKey: "id") {
-                    try defaultCollection.purge(id: id)
+                    try collection(T.self).purge(id: id)
                 }
             }
         }
@@ -331,21 +336,21 @@ public struct StorageDoneDatabase {
         
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
             .where(whereExpression)
         
         if batch == true {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try defaultCollection.purge(id: id)
+                        try collection(T.self).purge(id: id)
                     }
                 }
             }
         } else {
             for result in try query.execute() {
                 if let id = result.string(forKey: "id") {
-                    try defaultCollection.purge(id: id)
+                    try collection(T.self).purge(id: id)
                 }
             }
         }
@@ -354,7 +359,7 @@ public struct StorageDoneDatabase {
     public func delete<T>(_ elementType: T.Type, _ expression: ExpressionProtocol, batch: Bool = true) throws {
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
         
@@ -362,14 +367,14 @@ public struct StorageDoneDatabase {
             try database.inBatch {
                 for result in try query.execute() {
                     if let id = result.string(forKey: "id") {
-                        try defaultCollection.purge(id: id)
+                        try collection(T.self).purge(id: id)
                     }
                 }
             }
         } else {
             for result in try query.execute() {
                 if let id = result.string(forKey: "id") {
-                    try defaultCollection.purge(id: id)
+                    try collection(T.self).purge(id: id)
                 }
             }
         }
@@ -379,9 +384,9 @@ public struct StorageDoneDatabase {
         if let primaryKeyValue = (Mirror(reflecting: element).children.filter {
             $0.label != nil && $0.label == element.primaryKey()
             }.first?.value),
-           let document = try defaultCollection.document(id: "\(primaryKeyValue)-\(String(describing: T.self))") {
+           let document = try collection(T.self).document(id: "\(primaryKeyValue)-\(String(describing: T.self))") {
             if String(describing: T.self) == document.string(forKey: type) {
-                try defaultCollection.purge(document: document)            }
+                try collection(T.self).purge(document: document)            }
         }
     }
     
@@ -452,17 +457,16 @@ public struct StorageDoneDatabase {
     
     // MARK: - Live
     public func live<T: Codable>(_ classType: T.Type, closure: @escaping ([T]) -> ()) throws -> LiveQuery {
+        let collection = collection(T.self)
         let query = QueryBuilder
             .select(SelectResult.all())
-            .from(DataSource.collection(defaultCollection))
-            .where(Expression.property(type)
-                .equalTo(Expression.string(String(describing: T.self))))
+            .from(DataSource.collection(collection))
         
         let token = query.addChangeListener { (change) in
             guard let results = change.results else { return }
             var list = [T]()
             for result in results {
-                if let singleDictionary = result.toDictionary()[self.name],
+                if let singleDictionary = result.toDictionary()[collection.name],
                     let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
                     if let element = try? decoder.decode(T.self, from: jsonData) {
                         list.append(element)
@@ -484,15 +488,15 @@ public struct StorageDoneDatabase {
         let query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
             .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                 .and(expression))
         
-        let token = query.addChangeListener { (change) in
+        let token = query.addChangeListener(withQueue: DispatchQueue.global(qos: .utility)) { (change) in
             guard let results = change.results else { return }
             var list = [T]()
             for result in results {
-                if let singleDictionary = result.toDictionary()[self.name],
+                if let singleDictionary = result.toDictionary()[String(describing: T.self)],
                     let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
                     if let element = try? decoder.decode(T.self, from: jsonData) {
                         list.append(element)
@@ -519,7 +523,7 @@ public struct StorageDoneDatabase {
         var query: Query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
         
         if let from = query as? From {
             if let expression = advancedQuery.expression {
@@ -555,7 +559,7 @@ public struct StorageDoneDatabase {
             guard let results = change.results else { return }
             var list = [T]()
             for result in results {
-                if let singleDictionary = result.toDictionary()[self.name],
+                if let singleDictionary = result.toDictionary()[String(describing: T.self)],
                     let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
                     if let element = try? decoder.decode(T.self, from: jsonData) {
                         list.append(element)
@@ -618,7 +622,7 @@ public struct StorageDoneDatabase {
     
     // MARK: - Fulltext
     public func fulltextIndex<T>(_ type: T.Type, values: String...) throws {
-        try defaultCollection.createIndex(IndexBuilder.fullTextIndex(items: values.map {
+        try collection(T.self).createIndex(IndexBuilder.fullTextIndex(items: values.map {
             FullTextIndexItem.property($0)
         }), name: "\(String(describing: T.self))-index")
     }
@@ -626,7 +630,7 @@ public struct StorageDoneDatabase {
     public func search<T: Decodable>(_ text: String) throws -> [T] {
         let query = QueryBuilder
             .select(SelectResult.all())
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
             .where(
                 Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
                     .and(FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'"))
@@ -652,7 +656,7 @@ public struct StorageDoneDatabase {
         var query: Query = QueryBuilder
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
-            .from(DataSource.collection(defaultCollection))
+            .from(DataSource.collection(collection(T.self)))
         
         if let from = query as? From {
             if let expression = advancedQuery.expression {
