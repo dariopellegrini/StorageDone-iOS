@@ -146,8 +146,7 @@ public struct StorageDoneDatabase {
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
             .from(DataSource.collection(collection(T.self)))
-            .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                .and(expression))
+            .where(expression)
         
         var list = [T]()
         for result in try query.execute() {
@@ -166,8 +165,7 @@ public struct StorageDoneDatabase {
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
             .from(DataSource.collection(collection(T.self)))
-            .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                .and(expression))
+            .where(expression)
             .orderBy(orderings)
         
         var list = [T]()
@@ -195,11 +193,9 @@ public struct StorageDoneDatabase {
 
         if let from = query as? From {
             if let expression = advancedQuery.expression {
-                query = from.where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                    .and(expression))
+                query = from.where(expression)
             } else {
-                query = from.where(Expression.property(type)
-                    .equalTo(Expression.string(String(describing: T.self))))
+                query = from
             }
         }
 
@@ -489,8 +485,7 @@ public struct StorageDoneDatabase {
             .select(SelectResult.all(),
                     SelectResult.expression(Meta.id))
             .from(DataSource.collection(collection(T.self)))
-            .where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                .and(expression))
+            .where(expression)
         
         let token = query.addChangeListener(withQueue: DispatchQueue.global(qos: .utility)) { (change) in
             guard let results = change.results else { return }
@@ -527,11 +522,9 @@ public struct StorageDoneDatabase {
         
         if let from = query as? From {
             if let expression = advancedQuery.expression {
-                query = from.where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                    .and(expression))
+                query = from.where(expression)
             } else {
-                query = from.where(Expression.property(type)
-                    .equalTo(Expression.string(String(describing: T.self))))
+                query = from
             }
         }
         
@@ -632,9 +625,8 @@ public struct StorageDoneDatabase {
             .select(SelectResult.all())
             .from(DataSource.collection(collection(T.self)))
             .where(
-                Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                    .and(FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'"))
-        )
+                FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'")
+            )
         
         var list = [T]()
         for result in try query.execute() {
@@ -660,13 +652,11 @@ public struct StorageDoneDatabase {
         
         if let from = query as? From {
             if let expression = advancedQuery.expression {
-                query = from.where(Expression.property(type).equalTo(Expression.string(String(describing: T.self)))
-                    .and(FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'"))
+                query = from.where(FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'")
                     .and(expression))
             } else {
-                query = from.where(Expression.property(type)
-                    .equalTo(Expression.string(String(describing: T.self)))
-                    .and(FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'"))
+                query = from.where(
+                    FullTextFunction.match(Expression.fullTextIndex("\(String(describing: T.self))-index"), query: "'\(text)'")
                 )
             }
         }
