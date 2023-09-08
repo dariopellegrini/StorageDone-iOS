@@ -131,7 +131,7 @@ public struct StorageDoneDatabase {
         
         var list = [T]()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[name],
+            if let singleDictionary = result.toDictionary()[collection(T.self).name],
                 let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -150,7 +150,7 @@ public struct StorageDoneDatabase {
         
         var list = [T]()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[name] {
+            if let singleDictionary = result.toDictionary()[collection(T.self).name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -170,7 +170,7 @@ public struct StorageDoneDatabase {
         
         var list = [T]()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[name] {
+            if let singleDictionary = result.toDictionary()[collection(T.self).name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -222,7 +222,7 @@ public struct StorageDoneDatabase {
         var list = [T]()
         
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[name] {
+            if let singleDictionary = result.toDictionary()[collection(T.self).name] {
                 let jsonData = try JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted)
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -601,7 +601,7 @@ public struct StorageDoneDatabase {
         
         var list = [T]()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[name],
+            if let singleDictionary = result.toDictionary()[collection(T.self).name],
                 let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
@@ -654,7 +654,7 @@ public struct StorageDoneDatabase {
         
         var list = [T]()
         for result in try query.execute() {
-            if let singleDictionary = result.toDictionary()[name],
+            if let singleDictionary = result.toDictionary()[collection(T.self).name],
                 let jsonData = try? JSONSerialization.data(withJSONObject: singleDictionary, options: .prettyPrinted) {
                 if let element = try? decoder.decode(T.self, from: jsonData) {
                     list.append(element)
