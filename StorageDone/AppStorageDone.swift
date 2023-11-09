@@ -4,7 +4,6 @@
 //
 //  Created by Dario Pellegrini on 20/04/23.
 //
-
 import Combine
 import Foundation
 import SwiftUI
@@ -20,21 +19,21 @@ public class AppStorageDoneObject<T: Codable>: ObservableObject {
     
     private var cancellables: [AnyCancellable] = []
     
-    init(databaseName: String) {
+    public init(databaseName: String) {
         database = StorageDoneDatabase(name: databaseName)
         publisher = database.publisher(T.self)
         
         configure()
     }
     
-    init(database: StorageDoneDatabase) {
+    public init(database: StorageDoneDatabase) {
         self.database = database
         publisher = database.publisher(T.self)
         
         configure()
     }
     
-    init(databaseClosure: () -> StorageDoneDatabase) {
+    public init(databaseClosure: () -> StorageDoneDatabase) {
         self.database = databaseClosure()
         publisher = database.publisher(T.self)
         
