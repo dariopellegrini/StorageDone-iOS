@@ -11,7 +11,7 @@ import SwiftUI
 @available(iOS 15.0, *)
 public class AppStorageDoneObject<T: Codable>: ObservableObject {
     
-    @Published var state: [T] = []
+    @Published public var state: [T] = []
     
     private let database: StorageDoneDatabase
     
@@ -47,7 +47,7 @@ public class AppStorageDoneObject<T: Codable>: ObservableObject {
         }.store(in: &cancellables)
     }
     
-    func save(_ value: [T]) {
+    public func save(_ value: [T]) {
         Task {
             do {
                 try await database.async.deleteAllAndInsert(elements: value)
