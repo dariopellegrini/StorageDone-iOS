@@ -55,7 +55,9 @@ public struct StorageDoneDatabase {
     // MARK: - Collections
     func collection<T>(_ type: T.Type) -> Collection {
         do {
-            return try database.collection(name: String(describing: T.self), scope: String(describing: T.self)) ?? (try database.createCollection(name: String(describing: T.self), scope: String(describing: T.self)))
+            let collectionName = String(describing: T.self).replacingOccurrences(of: "<", with: "_").replacingOccurrences(of: ">", with: "_")
+            let scopeName = collectionName
+            return try database.collection(name: collectionName, scope: scopeName) ?? (try database.createCollection(name: collectionName, scope: scopeName))
         } catch let e {
             fatalError(e.localizedDescription)
         }
