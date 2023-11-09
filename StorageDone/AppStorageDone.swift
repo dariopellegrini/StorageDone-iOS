@@ -42,7 +42,7 @@ public class AppStorageDoneObject<T: Codable>: ObservableObject {
     }
     
     func configure() {
-        publisher.sink { [weak self] in
+        publisher.receive(on: RunLoop.main).sink { [weak self] in
             guard let self else { return }
             self.state = $0
         }.store(in: &cancellables)
