@@ -384,6 +384,8 @@ Any update will persist on the database and update any view bound to it.
 ```swift
 planet.name = "Namek"
 ```
+> **Important**
+> There is a limited number of database observation that can be opened. Use this features just in top levele views, not in list views.
 
 ## StorageDoneVariable (beta)
 StorageDone brings `StorageDoneVariable`, a struct that tries to emulate `BehaviorSubject` features, using the local database as a data container.
