@@ -171,6 +171,13 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
         }
     }
     
+    // MARK: - Batch
+    func batch(_ block: @escaping () throws -> ()) async throws {
+        try await Task(priority: priority) {
+            try self.base.batch(using: block)
+        }.value
+    }
+    
     // MARK: - Files
     func save(data: Data, id: String) async throws {
         try await Task(priority: priority) {

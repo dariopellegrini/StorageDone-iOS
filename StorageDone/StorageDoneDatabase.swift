@@ -606,6 +606,13 @@ public struct StorageDoneDatabase {
         return try live(options, dispatchQueue: dispatchQueue, closure: closure)
     }
     
+    // MARK: - Batch
+    func batch(using block: () throws -> Void) throws {
+        try database.inBatch {
+            try block()
+        }
+    }
+    
     // MARK: - Fulltext
     public func fulltextIndex<T>(_ type: T.Type, values: String...) throws {
         try collection(T.self).createIndex(IndexBuilder.fullTextIndex(items: values.map {
@@ -728,7 +735,7 @@ public struct StorageDoneDatabase {
     public func search<T: Decodable>(_ text: String, _ options: QueryOption...) throws -> [T] {
         return try search(text: text, options: options)
     }
-    
+
     // MARK: - Files
     public func save(data: Data, id: String) throws {
         let mutableDocument = MutableDocument(id: id)
