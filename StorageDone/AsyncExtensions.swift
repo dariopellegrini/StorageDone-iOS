@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CouchbaseLiteSwift
 
 @available(iOS 15, *)
 public extension StorageDoneDatabase {
@@ -90,6 +91,12 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
         }.value
     }
     
+    func delete<T: Codable>(_ type: T.Type, expression: ExpressionProtocol) async throws {
+        try await Task(priority: priority) {
+            try self.base.delete(type, expression)
+        }.value
+    }
+    
     func deleteAllAndInsert<T: Codable>(element: T) async throws {
         try await Task(priority: priority) {
             try self.base.deleteAllAndInsert(element: element)
@@ -102,6 +109,18 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
         }.value
     }
     
+    func deleteAndInsert<T: Codable>(elements: [T], expression: ExpressionProtocol) async throws {
+        try await Task(priority: priority) {
+            try self.base.deleteAndInsert(elements: elements, expression: expression)
+        }.value
+    }
+    
+    func deleteAndInsertOrUpdate<T: Codable>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) async throws {
+        try await Task(priority: priority) {
+            try self.base.deleteAndInsertOrUpdate(elements: elements, expression: expression, useExistingValuesAsFallback: useExistingValuesAsFallback)
+        }.value
+    }
+
     // MARK: - Live
     func live<T: Codable>() -> AsyncThrowingStream<[T], Error> {
         AsyncThrowingStream { continuation in

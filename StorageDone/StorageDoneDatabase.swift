@@ -405,6 +405,26 @@ public struct StorageDoneDatabase {
         }
     }
     
+    public func deleteAndInsert<T: Encodable>(elements: [T], expression: ExpressionProtocol) throws {
+        try database.inBatch {
+            try delete(T.self, expression, batch: false)
+            // Insert
+            try elements.forEach {
+                try insert(element: $0)
+            }
+        }
+    }
+    
+    public func deleteAndInsertOrUpdate<T: Encodable>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) throws {
+        try database.inBatch {
+            try delete(T.self, expression, batch: false)
+            // Insert
+            try elements.forEach {
+                try insertOrUpdate(element: $0, useExistingValuesAsFallback: useExistingValuesAsFallback)
+            }
+        }
+    }
+    
     public func purgeDeletedDocuments() throws {
         let query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
