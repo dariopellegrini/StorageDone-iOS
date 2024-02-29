@@ -11,7 +11,7 @@ import Foundation
 
 extension StorageDoneDatabase {
     
-    func migrateToRelease<T: Codable>(classType: T.Type, deleteAfterMigration: Bool = false) {
+    public func migrateToRelease<T: Codable>(classType: T.Type, deleteAfterMigration: Bool = false) {
         do {
             let query = QueryBuilder
                 .select(SelectResult.all(),
