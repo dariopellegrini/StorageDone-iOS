@@ -15,7 +15,7 @@ public typealias CodablePrimaryKey = Codable & PrimaryKey
 public struct StorageDoneDatabase {
     public let database: Database
     let name: String
-    private let type = "StorageDoneType"
+    let type = "StorageDoneType"
     
     let encoder: JSONEncoder
     let decoder: JSONDecoder
