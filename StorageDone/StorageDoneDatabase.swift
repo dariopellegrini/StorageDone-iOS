@@ -197,7 +197,7 @@ public struct StorageDoneDatabase {
             if let expression = advancedQuery.expression {
                 query = from.where(expression)
             } else {
-                query = from
+                query = from.where(Expression.all())
             }
         }
 
