@@ -1,9 +1,9 @@
 PODS:
-  - CouchbaseLite-Swift (3.1.1)
+  - CouchbaseLite-Swift (3.1.7)
   - RxSwift (6.5.0)
 
 DEPENDENCIES:
-  - CouchbaseLite-Swift (= 3.1.1)
+  - CouchbaseLite-Swift (= 3.1.7)
   - RxSwift
 
 SPEC REPOS:
@@ -12,9 +12,9 @@ SPEC REPOS:
     - RxSwift
 
 SPEC CHECKSUMS:
-  CouchbaseLite-Swift: 508ff8b1d817aeb37cd7f6af9dc23740a7e441e8
+  CouchbaseLite-Swift: f4d72cca15e437e6fd721f3cf2627330d590ad93
   RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
 
-PODFILE CHECKSUM: 3ddccfb60f1a29f664a549255ba40f21fb75073a
+PODFILE CHECKSUM: c4e1c7b150a17adbc85f68bc1e0f2f565b05a9c7
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.2
