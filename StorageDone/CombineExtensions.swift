@@ -73,6 +73,9 @@ public struct StorageDonePublisher<T: Codable>: Publisher {
         let subscription = StorageDoneSubscription<S, T>(storageDoneDatabase: storageDoneDatabase)
         subscription.target = subscriber
         
+        // Attaching our subscription to the subscriber:
+        subscriber.receive(subscription: subscription)
+        
         if let expressionProtocol {
             subscription.liveQuery = try? storageDoneDatabase.live(expressionProtocol, dispatchQueue: dispatchQueue) {
                 subscription.trigger(elements: $0)
@@ -86,9 +89,6 @@ public struct StorageDonePublisher<T: Codable>: Publisher {
                 subscription.trigger(elements: $0)
             }
         }
-        
-        // Attaching our subscription to the subscriber:
-        subscriber.receive(subscription: subscription)
     }
 }
 
