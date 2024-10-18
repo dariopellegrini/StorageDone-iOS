@@ -72,7 +72,7 @@ Pod::Spec.new do |spec|
   # spec.watchos.deployment_target = "2.0"
   # spec.tvos.deployment_target = "9.0"
 
-  spec.dependency 'CouchbaseLite-Swift', '~> 3.1.7'
+  spec.dependency 'CouchbaseLite-Swift', '~> 3.2.0'
   spec.dependency 'RxSwift'
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
