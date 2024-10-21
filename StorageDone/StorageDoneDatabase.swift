@@ -197,7 +197,7 @@ public struct StorageDoneDatabase {
             if let expression = advancedQuery.expression {
                 query = from.where(expression)
             } else {
-                query = from.where(Expression.all())
+                query = from.where(Expression.boolean(true))
             }
         }
 
@@ -254,7 +254,7 @@ public struct StorageDoneDatabase {
             }
         }
         
-        return try get {
+        return try self.get {
             if (expressionsArray.count > 0) {
                 $0.expression = and(expressions: expressionsArray)
             }
