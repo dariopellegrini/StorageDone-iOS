@@ -14,6 +14,7 @@ public typealias CodablePrimaryKey = Codable & PrimaryKey
 
 public struct StorageDoneDatabase: Sendable {
     public let database: Database
+    
     let name: String
     let type = "StorageDoneType"
     
