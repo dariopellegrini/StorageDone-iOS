@@ -6,13 +6,13 @@
 //  Copyright © 2019 Dario Pellegrini. All rights reserved.
 //
 
-import CouchbaseLiteSwift
+@preconcurrency import CouchbaseLiteSwift
 import CouchbaseLiteSwift.Swift
 import Foundation
 
 public typealias CodablePrimaryKey = Codable & PrimaryKey
 
-public struct StorageDoneDatabase {
+public struct StorageDoneDatabase: Sendable {
     public let database: Database
     let name: String
     let type = "StorageDoneType"
