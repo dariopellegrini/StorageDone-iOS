@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/couchbase/couchbase-lite-ios.git",
         "state": {
           "branch": null,
-          "revision": "a49f7dbcbd9a411dd0b473d92514bb90bd368f34",
-          "version": "3.2.0"
+          "revision": "4a466d2513922dd6c8a0da723f2a7d92ac0dcafc",
+          "version": "3.2.4"
         }
       },
       {
