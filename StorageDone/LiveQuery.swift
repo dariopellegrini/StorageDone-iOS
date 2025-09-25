@@ -9,7 +9,10 @@
 import CouchbaseLiteSwift
 
 public struct LiveQuery {
+    
+    
     let query: Query
+    
     let token: ListenerToken
     
     public func cancel() {
