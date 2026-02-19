@@ -34,7 +34,7 @@ public func <-<T: Decodable>(closure: (AdvancedQuery) -> (), database: StorageDo
 }
 
 infix operator ++=
-public func ++=<T: Encodable & PrimaryKey>(database: StorageDoneDatabase, element: T) {
+public func ++=<T: Encodable>(database: StorageDoneDatabase, element: T) {
     do {
         try database.insertOrUpdate(element: element)
     } catch let e {
@@ -42,7 +42,7 @@ public func ++=<T: Encodable & PrimaryKey>(database: StorageDoneDatabase, elemen
     }
 }
 
-public func ++=<T: Encodable & PrimaryKey>(database: StorageDoneDatabase, elements: [T]) {
+public func ++=<T: Encodable>(database: StorageDoneDatabase, elements: [T]) {
     do {
         try database.insertOrUpdate(elements: elements)
     } catch let e {

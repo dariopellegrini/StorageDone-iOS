@@ -65,7 +65,7 @@ public struct StorageDoneDatabase: Sendable {
     }
     
     // MARK: - Insert or upadate
-    public func insertOrUpdate<T: Encodable & PrimaryKey>(element: T, useExistingValuesAsFallback: Bool = false) throws {
+    public func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) throws {
         var dictionary = try element.asDictionary(encoder: encoder)
         
         var document = MutableDocument()
@@ -91,7 +91,7 @@ public struct StorageDoneDatabase: Sendable {
         try collection(T.self).save(document: document)
     }
     
-    public func insertOrUpdate<T: Encodable & PrimaryKey>(elements: [T], useExistingValuesAsFallback: Bool = false) throws {
+    public func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool = false) throws {
         try database.inBatch {
             try elements.forEach {
                 try insertOrUpdate(element: $0, useExistingValuesAsFallback: useExistingValuesAsFallback)
@@ -118,11 +118,11 @@ public struct StorageDoneDatabase: Sendable {
     }
     
     // MARK: - Upsert
-    public func upsert<T: Encodable & PrimaryKey>(element: T) throws {
+    public func upsert<T: Encodable>(element: T) throws {
         try insertOrUpdate(element: element)
     }
     
-    public func upsert<T: Encodable & PrimaryKey>(elements: [T]) throws {
+    public func upsert<T: Encodable>(elements: [T]) throws {
         try insertOrUpdate(elements: elements)
     }
     
@@ -380,7 +380,7 @@ public struct StorageDoneDatabase: Sendable {
         }
     }
     
-    public func deleteAllAndUpsert<T: Encodable & PrimaryKey>(elements: [T]) throws {
+    public func deleteAllAndUpsert<T: Encodable>(elements: [T]) throws {
         try database.inBatch {
             try delete(T.self, batch: false)
             // Insert
@@ -398,7 +398,7 @@ public struct StorageDoneDatabase: Sendable {
         }
     }
     
-    public func deleteAllAndUpsert<T: Encodable & PrimaryKey>(element: T) throws {
+    public func deleteAllAndUpsert<T: Encodable>(element: T) throws {
         try database.inBatch {
             try delete(T.self, batch: false)
             // Insert
@@ -416,7 +416,7 @@ public struct StorageDoneDatabase: Sendable {
         }
     }
     
-    public func deleteAndInsertOrUpdate<T: Encodable & PrimaryKey>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) throws {
+    public func deleteAndInsertOrUpdate<T: Encodable>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) throws {
         try database.inBatch {
             try delete(T.self, expression, batch: false)
             // Insert

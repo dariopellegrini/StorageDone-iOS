@@ -47,13 +47,13 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
     }
     
     // MARK: - Insert or update
-    func insertOrUpdate<T: Encodable & PrimaryKey>(element: T, useExistingValuesAsFallback: Bool = false) async throws {
+    func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) async throws {
         try await Task(priority: priority) {
             try self.base.insertOrUpdate(element: element, useExistingValuesAsFallback: useExistingValuesAsFallback)
         }.value
     }
     
-    func insertOrUpdate<T: Encodable & PrimaryKey>(elements: [T], useExistingValuesAsFallback: Bool = false) async throws {
+    func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool = false) async throws {
         try await Task(priority: priority) {
             try self.base.insertOrUpdate(elements: elements, useExistingValuesAsFallback: useExistingValuesAsFallback)
         }.value
@@ -115,7 +115,7 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
         }.value
     }
     
-    func deleteAndInsertOrUpdate<T: Codable & PrimaryKey>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) async throws {
+    func deleteAndInsertOrUpdate<T: Codable>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) async throws {
         try await Task(priority: priority) {
             try self.base.deleteAndInsertOrUpdate(elements: elements, expression: expression, useExistingValuesAsFallback: useExistingValuesAsFallback)
         }.value

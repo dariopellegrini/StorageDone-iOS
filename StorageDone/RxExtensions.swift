@@ -50,7 +50,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
     }
     
     // MARK: - Insert or update
-    func insertOrUpdate<T: Encodable & PrimaryKey>(element: T, useExistingValuesAsFallback: Bool = false) -> Observable<T> {
+    func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) -> Observable<T> {
         return Observable.create {
             subscriber in
             do {
@@ -64,7 +64,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func insertOrUpdate<T: Encodable & PrimaryKey>(elements: [T], useExistingValuesAsFallback: Bool) -> Observable<[T]> {
+    func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool) -> Observable<[T]> {
         return Observable.create {
             subscriber in
             do {
@@ -163,7 +163,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func deleteAllAndInsertOrUpdate<T: Encodable & PrimaryKey>(elements: [T]) -> Observable<[T]> {
+    func deleteAllAndInsertOrUpdate<T: Encodable>(elements: [T]) -> Observable<[T]> {
         return Observable.create {
             subscriber in
             do {
@@ -191,7 +191,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func deleteAllAndInsertOrUpdate<T: Encodable & PrimaryKey>(element: T) -> Observable<T> {
+    func deleteAllAndInsertOrUpdate<T: Encodable>(element: T) -> Observable<T> {
         return Observable.create {
             subscriber in
             do {
@@ -259,7 +259,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
     }
     
     // MARK: - Upsert
-    func upsert<T: Encodable & PrimaryKey>(element: T) -> Observable<T> {
+    func upsert<T: Encodable>(element: T) -> Observable<T> {
         return Observable.create {
             subscriber in
             do {
@@ -273,7 +273,7 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func upsert<T: Encodable & PrimaryKey>(elements: [T]) -> Observable<[T]> {
+    func upsert<T: Encodable>(elements: [T]) -> Observable<[T]> {
         return Observable.create {
             subscriber in
             do {
@@ -287,11 +287,11 @@ public extension RxWrapper where Base == StorageDoneDatabase {
         }
     }
     
-    func deleteAllAndUpsert<T: Encodable & PrimaryKey>(element: T) -> Observable<T> {
+    func deleteAllAndUpsert<T: Encodable>(element: T) -> Observable<T> {
         deleteAllAndInsertOrUpdate(element: element)
     }
     
-    func deleteAllAndUpsert<T: Encodable & PrimaryKey>(elements: [T]) -> Observable<[T]> {
+    func deleteAllAndUpsert<T: Encodable>(elements: [T]) -> Observable<[T]> {
         deleteAllAndInsertOrUpdate(elements: elements)
     }
     
