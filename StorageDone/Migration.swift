@@ -33,7 +33,7 @@ extension StorageDoneDatabase {
                 }
             }
 
-            try self.insertOrUpdate(elements: list)
+            try self.insert(elements: list)
             
             if deleteAfterMigration == true {
                 try self.database.inBatch {
