@@ -66,7 +66,7 @@ public struct StorageDoneVariable<T: Codable> {
             if delete == true {
                 try await database.async.deleteAllAndInsert(elements: elements)
             } else {
-                try await database.async.insertOrUpdate(elements: elements)
+                try await database.async.insert(elements: elements)
             }
         } catch let e {
             dump("Error in \(#function) \(e)")
