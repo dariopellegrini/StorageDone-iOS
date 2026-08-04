@@ -30,95 +30,150 @@ public struct AsyncQueueWrapper<Base> {
     }
 }
 
+/// Every method here runs its database work on a global concurrent queue, never on the caller's
+/// executor: CouchbaseLite calls are blocking, so they must stay off both the main thread and the
+/// Swift Concurrency cooperative pool. Keep this invariant if the target ever moves to Swift 6 with
+/// approachable concurrency — there, a plain `nonisolated` async method would start inheriting the
+/// caller's isolation and run on the main actor, and these methods would need `@concurrent`.
 @available(iOS 15, *)
 public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
-    
+
     // MARK: - Insert
     func insert<T: Encodable>(element: T) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.insert(element: element)
-        }.value
+        }
     }
     
     func insert<T: Encodable>(elements: [T]) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.insert(elements: elements)
-        }.value
+        }
     }
     
     // MARK: - Insert or update
     func insertOrUpdate<T: Encodable & PrimaryKey>(element: T, useExistingValuesAsFallback: Bool = false) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.insertOrUpdate(element: element, useExistingValuesAsFallback: useExistingValuesAsFallback)
-        }.value
+        }
     }
     
     func insertOrUpdate<T: Encodable & PrimaryKey>(elements: [T], useExistingValuesAsFallback: Bool = false) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.insertOrUpdate(elements: elements, useExistingValuesAsFallback: useExistingValuesAsFallback)
-        }.value
+        }
     }
     
     // MARK: - Get
     func get<T: Codable>() async throws -> [T] {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.get()
-        }.value
+        }
     }
     
     func get<T: Codable>(_ advancedQuery: @escaping (AdvancedQuery) -> ()) async throws -> [T] {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.get(using: advancedQuery)
-        }.value
+        }
     }
     
     func get<T: Codable>(_ queryOptions: QueryOption...) async throws -> [T] {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.get(queryOptions)
-        }.value
+        }
     }
     
     func get<T: Codable>(_ queryOptions: [QueryOption]) async throws -> [T] {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.get(queryOptions)
-        }.value
+        }
     }
     
     // MARK: - Delete
     func delete<T: Codable>(_ type: T.Type) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.delete(type)
-        }.value
+        }
     }
     
     func delete<T: Codable>(_ type: T.Type, expression: ExpressionProtocol) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.delete(type, expression)
-        }.value
+        }
     }
-    
+
+    func delete<T: PrimaryKey>(element: T) async throws {
+        try await with(qos: priority.qosClass) {
+            try self.base.delete(element: element)
+        }
+    }
+
+    func delete<T: PrimaryKey>(elements: [T]) async throws {
+        try await with(qos: priority.qosClass) {
+            try self.base.delete(elements: elements)
+        }
+    }
+
+    func purgeDeletedDocuments() async throws {
+        try await with(qos: priority.qosClass) {
+            try self.base.purgeDeletedDocuments()
+        }
+    }
+
+    // MARK: - Upsert
+    func upsert<T: Encodable & PrimaryKey>(element: T) async throws {
+        try await with(qos: priority.qosClass) {
+            try self.base.upsert(element: element)
+        }
+    }
+
+    func upsert<T: Encodable & PrimaryKey>(elements: [T]) async throws {
+        try await with(qos: priority.qosClass) {
+            try self.base.upsert(elements: elements)
+        }
+    }
+
+    func deleteAllAndUpsert<T: Encodable & PrimaryKey>(element: T) async throws {
+        try await with(qos: priority.qosClass) {
+            try self.base.deleteAllAndUpsert(element: element)
+        }
+    }
+
+    func deleteAllAndUpsert<T: Encodable & PrimaryKey>(elements: [T]) async throws {
+        try await with(qos: priority.qosClass) {
+            try self.base.deleteAllAndUpsert(elements: elements)
+        }
+    }
+
+    // MARK: - Delete and insert
     func deleteAllAndInsert<T: Codable>(element: T) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.deleteAllAndInsert(element: element)
-        }.value
+        }
     }
     
     func deleteAllAndInsert<T: Codable>(elements: [T]) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.deleteAllAndInsert(elements: elements)
-        }.value
+        }
     }
     
     func deleteAndInsert<T: Codable>(elements: [T], expression: ExpressionProtocol) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.deleteAndInsert(elements: elements, expression: expression)
-        }.value
+        }
     }
     
-    func deleteAndInsertOrUpdate<T: Codable>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) async throws {
-        try await Task(priority: priority) {
+    func deleteAndInsertOrUpdate<T: Codable & PrimaryKey>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) async throws {
+        try await with(qos: priority.qosClass) {
             try self.base.deleteAndInsertOrUpdate(elements: elements, expression: expression, useExistingValuesAsFallback: useExistingValuesAsFallback)
-        }.value
+        }
+    }
+
+    func deleteAndInsertOrUpdate<T: Codable>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) async throws {
+        try await with(qos: priority.qosClass) {
+            try self.base.deleteAndInsertOrUpdate(elements: elements, expression: expression, useExistingValuesAsFallback: useExistingValuesAsFallback)
+        }
     }
 
     // MARK: - Live
@@ -173,22 +228,38 @@ public extension AsyncQueueWrapper where Base == StorageDoneDatabase {
     
     // MARK: - Batch
     func batch(_ block: @escaping () throws -> ()) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.batch(using: block)
-        }.value
+        }
     }
     
     // MARK: - Files
     func save(data: Data, id: String) async throws {
-        try await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             try self.base.save(data: data, id: id)
-        }.value
+        }
     }
     
     func getData(id: String) async throws -> Data? {
-        await Task(priority: priority) {
+        try await with(qos: priority.qosClass) {
             self.base.getData(id: id)
-        }.value
+        }
+    }
+}
+
+@available(iOS 15, *)
+extension TaskPriority {
+    /// `DispatchQoS.QoSClass` equivalent, used to run database work on the global concurrent
+    /// queues instead of the cooperative pool. Compared by raw value because `TaskPriority`
+    /// is a struct whose cases alias each other (`.high` == `.userInitiated`, `.low` == `.utility`).
+    var qosClass: DispatchQoS.QoSClass {
+        switch rawValue {
+        case TaskPriority.high.rawValue: return .userInitiated
+        case TaskPriority.medium.rawValue: return .default
+        case TaskPriority.low.rawValue: return .utility
+        case TaskPriority.background.rawValue: return .background
+        default: return .default
+        }
     }
 }
 

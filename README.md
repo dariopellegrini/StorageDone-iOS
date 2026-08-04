@@ -66,6 +66,68 @@ let teachers = [Teacher(id: "id1", name: "Sarah", surname: "Jones", age: 29, cv:
 try? database.insertOrUpdate(elements: teachers)
 ```
 
+### Model isolation (Xcode 26 / Swift 6.2 and later)
+
+**Does this apply to you?** Only if your project sets `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, which is the default for projects created from the Xcode 26 template. If it doesn't, declare your models as plain structs and skip this section — nothing changed. Note that this is not a StorageDone rule: in a MainActor isolated target, even `JSONDecoder().decode(Teacher.self, from: data)` inside a `nonisolated` function fails to compile for the same reason.
+
+Persisted models must have **non isolated conformances**. Projects created from the Xcode 26 template set
+
+```
+SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
+```
+
+which makes every model implicitly `@MainActor`, and — since [SE-0470](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0470-isolated-conformances.md) — makes its `Codable` and `PrimaryKey` **conformances** isolated too. An isolated conformance cannot be used outside its actor: the runtime cast `element as? PrimaryKey` returns `nil` off the main actor, so every background upsert silently degrades into an insert with a random document id, producing duplicates.
+
+The recommended fix requires no annotation in your code: put the models in their own target compiled with non isolated default actor isolation, and keep `MainActor` as the default for the rest of the app.
+
+```
+// Models target build settings
+SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated
+```
+
+```swift
+// SPM, swift-tools-version 6.2 or later
+.target(name: "AppModels", swiftSettings: [.defaultIsolation(nil)])
+```
+
+If you prefer to keep the models in the app target, mark either the type or its conformances explicitly:
+
+```swift
+nonisolated struct Teacher: Codable, PrimaryKey { ... }
+
+// or, keeping the type MainActor isolated
+struct Teacher: Identifiable { ... }
+nonisolated extension Teacher: Codable {}
+nonisolated extension Teacher: PrimaryKey { func primaryKey() -> String { "id" } }
+```
+
+The annotation is needed on the **whole persisted graph**, not just on the root type. Nested types, child structs and enums used as properties are encoded and decoded through the parent's synthesized conformance, and the compiler does *not* check their isolation there — but their witnesses still execute off the main actor at runtime. An unannotated child compiles cleanly and works until actor data race checks are enabled, at which point it traps.
+
+```swift
+nonisolated struct HomeFeed: Codable, PrimaryKey {
+    nonisolated struct PeriodRef: Codable { let id: String }
+    let id: String
+    let periods: [PeriodRef]
+    func primaryKey() -> String { "id" }
+}
+
+nonisolated enum Status: String, Codable { case draft, published }
+```
+
+If the object graph is wide, the separate models target described above is the cheaper option: it covers every type at once instead of requiring one annotation per type.
+
+Models are pure data, so non isolated is their correct semantics in any case. `insertOrUpdate`, `upsert`, `deleteAllAndUpsert` and `deleteAndInsertOrUpdate` have overloads constrained to `Encodable & PrimaryKey`: those resolve the conformance at compile time, so they work from any thread and turn a forgotten annotation into a compile error instead of silent data duplication. In DEBUG builds, an element reaching the random id path logs a warning.
+
+### Threading
+
+Every CouchbaseLite call is blocking. The synchronous API blocks whichever thread calls it, so it must not be used from the main thread outside of app startup; use the `async` API instead, which runs the work on global concurrent queues — never on the main thread and never on the Swift Concurrency cooperative pool.
+
+To audit main thread usage, enable in DEBUG:
+
+```swift
+StorageDoneDatabase.warnOnMainThreadAccess = true
+```
+
 ### Operators
 Database objects can use different custom operators, which wrap try-catch logic and give a more compact way to access database
 ```swift

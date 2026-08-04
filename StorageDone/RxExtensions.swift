@@ -50,6 +50,36 @@ public extension RxWrapper where Base == StorageDoneDatabase {
     }
     
     // MARK: - Insert or update
+    // PrimaryKey-constrained overloads: the conformance is resolved at compile time, so upserts
+    // stay correct even when the subscription runs off the main actor (SE-0470).
+    func insertOrUpdate<T: Encodable & PrimaryKey>(element: T, useExistingValuesAsFallback: Bool = false) -> Observable<T> {
+        return Observable.create {
+            subscriber in
+            do {
+                try self.base.insertOrUpdate(element: element, useExistingValuesAsFallback: useExistingValuesAsFallback)
+                subscriber.onNext(element)
+                subscriber.onCompleted()
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+
+    func insertOrUpdate<T: Encodable & PrimaryKey>(elements: [T], useExistingValuesAsFallback: Bool) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            do {
+                try self.base.insertOrUpdate(elements: elements, useExistingValuesAsFallback: useExistingValuesAsFallback)
+                subscriber.onNext(elements)
+                subscriber.onCompleted()
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+
     func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) -> Observable<T> {
         return Observable.create {
             subscriber in
@@ -259,6 +289,34 @@ public extension RxWrapper where Base == StorageDoneDatabase {
     }
     
     // MARK: - Upsert
+    func upsert<T: Encodable & PrimaryKey>(element: T) -> Observable<T> {
+        return Observable.create {
+            subscriber in
+            do {
+                try self.base.upsert(element: element)
+                subscriber.onNext(element)
+                subscriber.onCompleted()
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+
+    func upsert<T: Encodable & PrimaryKey>(elements: [T]) -> Observable<[T]> {
+        return Observable.create {
+            subscriber in
+            do {
+                try self.base.upsert(elements: elements)
+                subscriber.onNext(elements)
+                subscriber.onCompleted()
+            } catch let e {
+                subscriber.onError(e)
+            }
+            return Disposables.create()
+        }
+    }
+
     func upsert<T: Encodable>(element: T) -> Observable<T> {
         return Observable.create {
             subscriber in

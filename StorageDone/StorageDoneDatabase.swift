@@ -12,6 +12,11 @@ import Foundation
 
 public typealias CodablePrimaryKey = Codable & PrimaryKey
 
+#if DEBUG
+private let mainThreadAuditLock = NSLock()
+private nonisolated(unsafe) var mainThreadAuditReported = Set<String>()
+#endif
+
 public struct StorageDoneDatabase: Sendable {
     public let database: Database
     
@@ -53,8 +58,32 @@ public struct StorageDoneDatabase: Sendable {
         }
     }
     
+    // MARK: - Main thread audit
+    #if DEBUG
+    /// Opt-in audit: when `true`, StorageDone logs once per type whenever database work happens on
+    /// the main thread. CouchbaseLite calls are blocking, so anything reported here is a stall of
+    /// the UI. Off by default, because the synchronous API is legitimately used on the main thread
+    /// at startup by the legacy property wrappers.
+    ///
+    ///     StorageDoneDatabase.warnOnMainThreadAccess = true
+    public nonisolated(unsafe) static var warnOnMainThreadAccess = false
+    #endif
+
+    private func debugWarnIfMainThread<T>(_ type: T.Type) {
+        #if DEBUG
+        guard StorageDoneDatabase.warnOnMainThreadAccess, Thread.isMainThread else { return }
+        let name = String(describing: T.self)
+        mainThreadAuditLock.lock()
+        let firstTime = mainThreadAuditReported.insert(name).inserted
+        mainThreadAuditLock.unlock()
+        guard firstTime else { return }
+        print("[StorageDone] database access for \(name) is running on the main thread. CouchbaseLite calls block the caller — use the async API (`database.async`) instead.")
+        #endif
+    }
+
     // MARK: - Collections
     func collection<T>(_ type: T.Type) -> Collection {
+        debugWarnIfMainThread(T.self)
         do {
             let collectionName = String(describing: T.self).replacingOccurrences(of: "<", with: "_").replacingOccurrences(of: ">", with: "_")
             let scopeName = collectionName
@@ -65,13 +94,16 @@ public struct StorageDoneDatabase: Sendable {
     }
     
     // MARK: - Insert or upadate
-    public func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) throws {
+
+    /// Shared implementation. `primaryKeyName` is resolved by the caller, either statically
+    /// (`T: PrimaryKey` overloads) or through a runtime cast (unconstrained overloads).
+    private func insertOrUpdate<T: Encodable>(element: T, primaryKeyName: String?, useExistingValuesAsFallback: Bool) throws {
         var dictionary = try element.asDictionary(encoder: encoder)
-        
+
         var document = MutableDocument()
-        if let element = element as? PrimaryKey,
+        if let primaryKeyName = primaryKeyName,
             let primaryKeyValue = (Mirror(reflecting: element).children.filter {
-                $0.label != nil && $0.label == element.primaryKey()
+                $0.label != nil && $0.label == primaryKeyName
                 }.first?.value) {
             document = MutableDocument(id: "\(primaryKeyValue)-\(String(describing: T.self))")
             if useExistingValuesAsFallback == true,
@@ -83,14 +115,45 @@ public struct StorageDoneDatabase: Sendable {
                     }
                 }
             }
+        } else if let primaryKeyName = primaryKeyName {
+            debugWarnPrimaryKeyPropertyNotFound(T.self, primaryKeyName: primaryKeyName)
         }
-        
+
         document.setData(dictionary)
         document.setString(String(describing: T.self), forKey: type)
-        
+
         try collection(T.self).save(document: document)
     }
-    
+
+    // MARK: Insert or update — PrimaryKey constrained (preferred)
+    // The witness table is passed at compile time, so no runtime conformance lookup can fail.
+    // An actor-isolated conformance (SE-0470, `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`)
+    // becomes a compile-time diagnostic instead of a silent random-id insert.
+    public func insertOrUpdate<T: Encodable & PrimaryKey>(element: T, useExistingValuesAsFallback: Bool = false) throws {
+        try insertOrUpdate(element: element,
+                           primaryKeyName: element.primaryKey(),
+                           useExistingValuesAsFallback: useExistingValuesAsFallback)
+    }
+
+    public func insertOrUpdate<T: Encodable & PrimaryKey>(elements: [T], useExistingValuesAsFallback: Bool = false) throws {
+        try database.inBatch {
+            try elements.forEach {
+                try insertOrUpdate(element: $0, useExistingValuesAsFallback: useExistingValuesAsFallback)
+            }
+        }
+    }
+
+    // MARK: Insert or update — unconstrained fallback (random id when T is not a PrimaryKey)
+    public func insertOrUpdate<T: Encodable>(element: T, useExistingValuesAsFallback: Bool = false) throws {
+        let primaryKeyName = (element as? PrimaryKey)?.primaryKey()
+        if primaryKeyName == nil {
+            debugWarnMissingPrimaryKey(T.self)
+        }
+        try insertOrUpdate(element: element,
+                           primaryKeyName: primaryKeyName,
+                           useExistingValuesAsFallback: useExistingValuesAsFallback)
+    }
+
     public func insertOrUpdate<T: Encodable>(elements: [T], useExistingValuesAsFallback: Bool = false) throws {
         try database.inBatch {
             try elements.forEach {
@@ -98,7 +161,25 @@ public struct StorageDoneDatabase: Sendable {
             }
         }
     }
-    
+
+    private func debugWarnMissingPrimaryKey<T>(_ type: T.Type) {
+        #if DEBUG
+        print("""
+        [StorageDone] \(String(describing: T.self)) reached insertOrUpdate without a visible PrimaryKey \
+        conformance: the document is saved with a random id instead of being upserted. If the type does \
+        conform to PrimaryKey, its conformance is actor-isolated (Swift 6.2 SE-0470 + \
+        SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor) and the runtime cast fails off the main actor — \
+        declare the model `nonisolated`.
+        """)
+        #endif
+    }
+
+    private func debugWarnPrimaryKeyPropertyNotFound<T>(_ type: T.Type, primaryKeyName: String) {
+        #if DEBUG
+        print("[StorageDone] \(String(describing: T.self)).primaryKey() returned \"\(primaryKeyName)\", but no stored property with that name exists: the document is saved with a random id instead of being upserted.")
+        #endif
+    }
+
     // MARK: - Insert
     public func insert<T: Encodable>(element: T) throws {
         let dictionary = try element.asDictionary(encoder: encoder)
@@ -118,10 +199,18 @@ public struct StorageDoneDatabase: Sendable {
     }
     
     // MARK: - Upsert
+    public func upsert<T: Encodable & PrimaryKey>(element: T) throws {
+        try insertOrUpdate(element: element)
+    }
+
+    public func upsert<T: Encodable & PrimaryKey>(elements: [T]) throws {
+        try insertOrUpdate(elements: elements)
+    }
+
     public func upsert<T: Encodable>(element: T) throws {
         try insertOrUpdate(element: element)
     }
-    
+
     public func upsert<T: Encodable>(elements: [T]) throws {
         try insertOrUpdate(elements: elements)
     }
@@ -380,6 +469,34 @@ public struct StorageDoneDatabase: Sendable {
         }
     }
     
+    public func deleteAllAndUpsert<T: Encodable & PrimaryKey>(elements: [T]) throws {
+        try database.inBatch {
+            try delete(T.self, batch: false)
+            // Insert
+            try elements.forEach {
+                try insertOrUpdate(element: $0)
+            }
+        }
+    }
+
+    public func deleteAllAndUpsert<T: Encodable & PrimaryKey>(element: T) throws {
+        try database.inBatch {
+            try delete(T.self, batch: false)
+            // Insert
+            try insertOrUpdate(element: element)
+        }
+    }
+
+    public func deleteAndInsertOrUpdate<T: Encodable & PrimaryKey>(elements: [T], expression: ExpressionProtocol, useExistingValuesAsFallback: Bool = false) throws {
+        try database.inBatch {
+            try delete(T.self, expression, batch: false)
+            // Insert
+            try elements.forEach {
+                try insertOrUpdate(element: $0, useExistingValuesAsFallback: useExistingValuesAsFallback)
+            }
+        }
+    }
+
     public func deleteAllAndUpsert<T: Encodable>(elements: [T]) throws {
         try database.inBatch {
             try delete(T.self, batch: false)
