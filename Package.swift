@@ -15,9 +15,13 @@ let package = Package(
             targets: ["StorageDone"]),
     ],
     dependencies: [
+        // Couchbase ha rimosso Package.swift dal repo a partire dal tag 3.4.0:
+        // senza il tetto, SwiftPM prova i tag 4.x, non trova il manifest e la
+        // risoluzione fallisce con "the package manifest at '/Package.swift'
+        // cannot be accessed". 3.3.3 e' l'ultimo tag che ha ancora il manifest.
         .package(name: "CouchbaseLiteSwift",
             url: "https://github.com/couchbase/couchbase-lite-ios.git",
-            from: "3.2.4"),
+            Version(3, 2, 4)..<Version(3, 4, 0)),
         .package(name: "RxSwift",
             url: "https://github.com/ReactiveX/RxSwift.git",
             from: "6.5.0")
@@ -33,4 +37,3 @@ let package = Package(
         )
     ]
 )
-
